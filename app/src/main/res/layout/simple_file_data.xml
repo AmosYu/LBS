@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_height="40dp">
+
+        <TextView
+            android:id="@+id/filedat_lac"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:textSize="@dimen/text_size_14"
+          />
+
+        <TextView
+            android:layout_width="0.5dip"
+            android:layout_weight="0"
+            android:background="@color/grey_3"
+            android:layout_height="match_parent"/>
+        <TextView
+            android:id="@+id/filedat_ci"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:textSize="@dimen/text_size_14"
+            />
+        <TextView
+            android:layout_width="0.5dip"
+            android:layout_weight="0"
+            android:background="@color/grey_3"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/filedat_bid"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="@dimen/text_size_14"
+            android:gravity="center"/>
+        <TextView
+            android:layout_width="0.5dip"
+            android:layout_weight="0"
+            android:background="@color/grey_3"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/filedat_zhishi"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="@dimen/text_size_14"
+            android:gravity="center"/>
+
+</LinearLayout>

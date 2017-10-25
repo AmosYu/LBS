@@ -3,4 +3,21 @@
 
     <string name="message_confirm_to_exit">确定要退出吗?</string>
     <string name="title_dialog_exit_confirm">确认退出</string>
+
+
+    <string-array name="mode_arrays">
+        <item>全部</item>
+        <item>G移动</item>
+        <item>G联通</item>
+        <item>WCDMA</item>
+        <item>CDMA</item>
+        <item>TD</item>
+        <item>LTE</item>
+    </string-array>
+
+    <string name="attention_1">注意事项一.与采集器连接\r\n\r\n使用软件前应先确定PAD是否与采集器进行了蓝牙配对，且每个PAD只能与一个采集器配对。\r\n\r\n如果PAD与其它采集器也进行了蓝牙配对请将其取消。</string>
+    <string name="attention_2">注意事项二.数据导入\r\n\r\n数据导入前先将采集器的SD卡取出,插入PAD内，并将PAD的默认存储空间设置为SD卡。导入结束后请及时将SD卡从PAD内取出。\r\n\r\n默认存储空间位置修改方法：\r\n\r\n系统版本6.0以下，先进入PAD的设置界面，选择存储进入存储信息页面，此页面下方有默认存储空间选择项。\r\n\r\n系统版本6.0及以上，首先进入PAD的设置界面，点击“高级设置”。在高级设置内点击“内存和存储”。进入内存和存储界面后，找到“默认存储位置”修改为SD卡</string>
+    <string name="attention_3">注意事项三.数据导出\r\n\r\n数据导出的文件存放于默认存储空间下的基站数据文件夹。</string>
+    <string name="attention_4">注意事项四.数据上传\r\n\r\n数据上传时每次上传一个文件，文件上传成功后不会再出现在文件选择列表内。不会出现重复上传的现象。</string>
+
 </resources>

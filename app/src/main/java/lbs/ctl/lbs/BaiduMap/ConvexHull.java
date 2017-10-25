@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import lbs.ctl.lbs.util.Point;
+import lbs.ctl.lbs.utils.Point;
 
 import static java.lang.Math.abs;
 

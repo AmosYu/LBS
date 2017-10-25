@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.5"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/blue3"
+            android:gravity="center|left"
+            android:text="数据文件表"
+            android:textSize="@dimen/text_size_16" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_weight="0"
+            android:background="@color/grey_3" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/blue_1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="ID"
+                android:textSize="@dimen/text_size_16" />
+
+            <TextView
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:background="@color/grey_3" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="文件名"
+                android:textSize="@dimen/text_size_16" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/grey_3" />
+
+        <ListView
+            android:id="@+id/filename_ListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="@color/grey_3"
+            android:background="@color/white"
+            android:dividerHeight="0.5dip" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_weight="0"
+        android:background="@color/grey_3" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2.5"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/data_label"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/blue3">
+
+            <RadioGroup
+                android:id="@+id/find_radiogroup"
+                android:layout_width="200dp"
+                android:orientation="horizontal"
+                android:layout_alignParentLeft="true"
+                android:layout_height="match_parent" >
+                <RadioButton
+                    android:id="@+id/find_data_rb"
+                    android:text="显示数据"
+                    android:checked="true"
+                    android:textSize="@dimen/text_size_16"
+                    android:textColor="@color/black"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="fill_parent"></RadioButton>
+                <RadioButton
+                    android:id="@+id/find_map_rb"
+                    android:text="显示地图"
+                    android:textSize="@dimen/text_size_16"
+                    android:textColor="@color/black"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="fill_parent"></RadioButton>
+            </RadioGroup>
+            <Spinner
+                android:id="@+id/finddata_spinner_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:entries="@array/mode_arrays"
+                android:spinnerMode="dropdown" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_toLeftOf="@id/finddata_spinner_mode"
+                android:gravity="center"
+                android:text="显示："
+                android:textSize="@dimen/text_size_16" />
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@id/data_label"
+            android:background="@color/grey_3" />
+
+        <LinearLayout
+            android:id="@+id/data_list_lable"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@id/data_label"
+            android:layout_marginTop="0.5dp"
+            android:background="@color/blue_1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="LAC(SID)"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_16" />
+
+            <TextView
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:background="@color/grey_3" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="CI(NID)"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_16" />
+
+            <TextView
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:background="@color/grey_3" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="BID"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_16" />
+
+            <TextView
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:background="@color/grey_3" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="小区类型"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_16" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@id/data_list_lable"
+            android:layout_weight="0"
+            android:background="@color/grey_3" />
+
+        <ListView
+            android:id="@+id/filedata_ListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/data_list_lable"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="@color/grey_3"
+            android:background="@color/white"
+            android:dividerHeight="0.5dip" />
+        <com.baidu.mapapi.map.MapView
+            android:id="@+id/find_baidu_mapview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/data_label"
+            android:layout_marginTop="0.5dp"
+            android:clickable="true"
+            android:visibility="invisible" />
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/layout_showArea"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <TextView
+            android:id="@+id/tv_task_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HTC M8"
+            android:textColor="#162834"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/recent_execute"
+            android:layout_toRightOf="@id/tv_task_name"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="12dp"
+            android:text="最近执行："
+            android:gravity="bottom"
+            android:textColor="#F75252"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_toRightOf="@id/recent_execute"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="2000"
+            android:gravity="bottom"
+            android:textColor="#F75252"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#767171"
+            android:textSize="15sp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_hideArea"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:background="@color/grey_2"
+        android:padding="10dp" >
+        <LinearLayout
+            android:id="@+id/view_detail"
+
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/tv_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="活动截止时间："
+                android:textColor="#162834"
+                android:textSize="12sp" />
+            <TextView
+                android:id="@+id/tv_detail_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="详情"
+                android:textColor="#162834"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/view_upload"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/tv_upload"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="活动截止时间："
+                android:textColor="#162834"
+                android:textSize="12sp" />
+            <TextView
+                android:id="@+id/tv_upload_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="上传"
+                android:textColor="#162834"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/view_export"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_export"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/tv_time"
+                android:textColor="#162834"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_export_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="数据导出"
+                android:textColor="#162834"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/view_delete"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/tv_delete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="活动截止时间："
+                android:textColor="#162834"
+                android:textSize="12sp" />
+            <TextView
+                android:id="@+id/tv_delete_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="删除"
+                android:textColor="#162834"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

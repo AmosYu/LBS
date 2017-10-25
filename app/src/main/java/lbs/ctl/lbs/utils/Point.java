@@ -1,4 +1,4 @@
-package lbs.ctl.lbs.util;
+package lbs.ctl.lbs.utils;
 
 /**
  * Created by CTL on 2017/10/20.

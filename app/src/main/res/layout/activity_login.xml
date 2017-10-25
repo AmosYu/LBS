@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="lbs.ctl.lbs.ui.LoginActivity">
+
+    <RelativeLayout
+        android:background="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="路测任务"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="@dimen/size_20sp" />
+
+        <Button
+            android:id="@+id/new_task_top_btn"
+            android:layout_alignParentRight="true"
+            android:text="新建任务"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/task_listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="@color/grey_3"
+        android:dividerHeight="0.5dip" />
+    <LinearLayout
+        android:id="@+id/null_task_liner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/size_20sp"
+            android:text="暂无工作任务"/>
+        <Button
+            android:id="@+id/new_task_center_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+点击新建任务"/>
+    </LinearLayout>
+
+</LinearLayout>

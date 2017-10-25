@@ -27,11 +27,9 @@ import com.baidu.mapapi.utils.OpenClientUtil;
 import com.baidu.mapapi.utils.route.BaiduMapRoutePlan;
 import com.baidu.mapapi.utils.route.RouteParaOption;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lbs.ctl.lbs.R;
-import lbs.ctl.lbs.util.Point;
 
 /**
  * Created by CTL on 2017/10/24.
