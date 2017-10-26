@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="230dp"
+    android:orientation="vertical">
+
+    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--android:layout_width="match_parent" android:layout_height="50dp"-->
+        <!--android:orientation="horizontal">-->
+        <!--<TextView-->
+            <!--android:text="IP:"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="0.5"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:gravity="center"-->
+            <!--android:textColor="@color/black"/>-->
+        <!--<EditText-->
+            <!--android:id="@+id/sever_ip_edit"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="3"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:gravity="center|left"-->
+            <!--android:inputType="text"-->
+            <!--android:maxLines="1"-->
+            <!--android:textColor="@color/black"/>-->
+        <!--<TextView-->
+            <!--android:text="端口:"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="0.5"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:gravity="center"-->
+            <!--android:textColor="@color/black"/>-->
+        <!--<EditText-->
+            <!--android:id="@+id/sever_port_edit"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:gravity="center|left"-->
+            <!--android:inputType="number"-->
+            <!--android:maxLines="1"-->
+            <!--android:textColor="@color/black"/>-->
+    <!--</LinearLayout>-->
+    <!--<TextView-->
+        <!--android:id="@+id/number_tv"-->
+        <!--android:text="数据总数"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="50dp" />-->
+
+    <!--<ProgressBar-->
+        <!--android:id="@+id/upload_probar"-->
+        <!--style="@android:style/Widget.ProgressBar.Horizontal"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="@dimen/view_size_50" />-->
+
+    <!--<Button-->
+        <!--android:id="@+id/upload_action_btn"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:text="开始上传"-->
+        <!--android:layout_height="50dp" />-->
+</LinearLayout>

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lbs.ctl.lbs.luce.CellType;
 import lbs.ctl.lbs.luce.LuceCellInfo;
 
 
@@ -112,6 +113,44 @@ public class DbAcessImpl implements DbAccess {
 //        db.close();
         return result;
     }
+
+    public boolean cellInDbUserdataS(LuceCellInfo luceCellInfo,boolean isCdma) {
+        SQLiteDatabase db = dHelper.getReadableDatabase();
+        Cursor cursor = null;
+        boolean result = false;
+        if(isCdma){
+            cursor = dbRead.query(USER_DATA,new String[]{LAC_SID,CI_NID,BID,USER_REMARK,LATITUDE,LONGITUDE},
+                    LAC_SID+"=? and "+CI_NID+"=? and "+BID+"=? and "+USER_REMARK+"=? and "+LATITUDE+"=? and "+LONGITUDE+"=? ",
+                    new String[]{String.valueOf(luceCellInfo.getLac_sid()),
+                            String.valueOf(luceCellInfo.getCi_nid()),
+                            String.valueOf(luceCellInfo.getBid()),
+                            luceCellInfo.getUserRemark(),
+                            String.valueOf(luceCellInfo.getLatitude()),
+                            String.valueOf(luceCellInfo.getLongitude())},
+                    null,null,null);
+        }
+        else{
+            cursor = dbRead.query(USER_DATA,new String[]{LAC_SID,CI_NID},
+                    LAC_SID+"=? and "+CI_NID+"=? and "+USER_REMARK+"=?and "+LATITUDE+"=? and "+LONGITUDE+"=? ",
+                    new String[]{String.valueOf(luceCellInfo.getLac_sid()),
+                            String.valueOf(luceCellInfo.getCi_nid()),
+                            luceCellInfo.getUserRemark(),
+                            String.valueOf(luceCellInfo.getLatitude()),
+                            String.valueOf(luceCellInfo.getLongitude())},
+                    null,null,null);
+        }
+        if(cursor!=null){
+            if(cursor.getCount()>0) {
+                result = true;
+            }
+        }
+        cursor.close();
+//        db.close();
+        return result;
+    }
+
+
+
 
     @Override
     public void deleteCellMapInfo(LuceCellInfo luceCellInfo, boolean isCdma,int type) {
@@ -344,6 +383,77 @@ public class DbAcessImpl implements DbAccess {
             list.add(map);
         }
 //        db.close();
+        return list;
+    }
+
+    public List<LuceCellInfo> findBtsUseId(String lac_sid, String ci_nid, CellType type){
+        List<LuceCellInfo> list=new ArrayList<>();
+        String cellType = type.toString();
+        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where LAC_SID=? AND CI_NID=? AND CELL_TYPE=?",
+                new String[]{lac_sid,ci_nid,cellType});
+        while (cursor.moveToNext()){
+            LuceCellInfo lci = new LuceCellInfo();
+            lci.setLac_sid(cursor.getInt(0));
+            lci.setCi_nid(cursor.getInt(1));
+            lci.setBid(cursor.getInt(2));
+            lci.setCellType(cursor.getString(3));
+            lci.setLatitude(cursor.getDouble(4));
+            lci.setLongitude(cursor.getDouble(5));
+            lci.setAddress(cursor.getString(6));
+            lci.setArfcn(cursor.getInt(7));
+            lci.setRssi(cursor.getInt(8));
+            lci.setTime(String.valueOf(cursor.getInt(9)));
+            lci.setBtsType(cursor.getString(10));
+            list.add(lci);
+        }
+        return list;
+    }
+
+    public List<LuceCellInfo> findOnlySameLacBts(String lac_sid,String ci_nid,CellType type){
+        List<LuceCellInfo> list=new ArrayList<>();
+        String cellType = type.toString();
+        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where LAC_SID=? AND CI_NID!=? AND CELL_TYPE=?",
+                new String[]{lac_sid,ci_nid,cellType});
+        while (cursor.moveToNext()){
+            LuceCellInfo lci = new LuceCellInfo();
+            lci.setLac_sid(cursor.getInt(0));
+            lci.setCi_nid(cursor.getInt(1));
+            lci.setBid(cursor.getInt(2));
+            lci.setCellType(cursor.getString(3));
+            lci.setLatitude(cursor.getDouble(4));
+            lci.setLongitude(cursor.getDouble(5));
+            lci.setAddress(cursor.getString(6));
+            lci.setArfcn(cursor.getInt(7));
+            lci.setRssi(cursor.getInt(8));
+            lci.setTime(String.valueOf(cursor.getInt(9)));
+            lci.setBtsType(cursor.getString(10));
+            list.add(lci);
+        }
+        return list;
+    }
+
+
+
+    public List<LuceCellInfo> findBtsUseId(String lac_sid, String ci_nid, String bid){
+        List<LuceCellInfo> list=new ArrayList<>();
+        String cellType = CellType.CDMA.toString();
+        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where LAC_SID=? AND CI_NID=? BID=? ANDAND CELL_TYPE=?",
+                new String[]{lac_sid,ci_nid,bid,cellType});
+        while (cursor.moveToNext()){
+            LuceCellInfo lci = new LuceCellInfo();
+            lci.setLac_sid(cursor.getInt(0));
+            lci.setCi_nid(cursor.getInt(1));
+            lci.setBid(cursor.getInt(2));
+            lci.setCellType(cursor.getString(3));
+            lci.setLatitude(cursor.getDouble(4));
+            lci.setLongitude(cursor.getDouble(5));
+            lci.setAddress(cursor.getString(6));
+            lci.setArfcn(cursor.getInt(7));
+            lci.setRssi(cursor.getInt(8));
+            lci.setTime(String.valueOf(cursor.getInt(9)));
+            lci.setBtsType(cursor.getString(10));
+            list.add(lci);
+        }
         return list;
     }
 

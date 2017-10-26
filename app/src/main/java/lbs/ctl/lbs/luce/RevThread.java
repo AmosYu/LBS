@@ -31,6 +31,7 @@ public class RevThread implements Runnable {
         this.blueConn = blueConn;
         this.allCellInfo = allCellInfo;
         dbAcess = DbAcessImpl.getDbInstance(context);
+        this.context = context;
     }
 
     public void run() {

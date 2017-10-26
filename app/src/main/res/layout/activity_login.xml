@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,6 +8,7 @@
     tools:context="lbs.ctl.lbs.ui.LoginActivity">
 
     <RelativeLayout
+        android:id="@+id/login_top"
         android:background="@color/colorPrimaryDark"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -32,26 +33,64 @@
 
     <ListView
         android:id="@+id/task_listview"
+        android:layout_below="@id/login_top"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
         android:cacheColorHint="@android:color/transparent"
         android:divider="@color/grey_3"
         android:dividerHeight="0.5dip" />
+    <!--<LinearLayout-->
+        <!--android:id="@+id/null_task_liner"-->
+        <!--android:layout_below="@id/login_top"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="@dimen/size_20sp"-->
+            <!--android:text="暂无工作任务"/>-->
+        <!--<Button-->
+            <!--android:id="@+id/new_task_center_btn"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="+点击新建任务"/>-->
+    <!--</LinearLayout>-->
     <LinearLayout
-        android:id="@+id/null_task_liner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/size_20sp"
-            android:text="暂无工作任务"/>
+        android:layout_width="fill_parent" android:layout_height="50dp"         android:layout_weight="1"
+        android:background="@color/blue_1"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
         <Button
-            android:id="@+id/new_task_center_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+点击新建任务"/>
-    </LinearLayout>
+            android:id="@+id/login_"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="基站查询"
+            android:layout_height="match_parent" />
+        <Button
+            android:id="@+id/login_offlinemap_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="离线地图"
+            android:layout_height="match_parent" />
+        <Button
+            android:id="@+id/login_import_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="文件导入"
+            android:layout_height="match_parent" />
+        <Button
+            android:id="@+id/login_export_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="文件导出"
+            android:layout_height="match_parent" />
+        <Button
+            android:id="@+id/login_upload_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="文件上传"
+            android:layout_height="match_parent" />
 
-</LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
