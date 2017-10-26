@@ -23,7 +23,7 @@ public class AllCellInfo extends Observable {
     private LuceCellInfo tdInfo;
     private double latitude = 0.0;
     private  double longitude = 0.0;
-    private String userMark = "test";//文件名=mark=用户标识的地址
+    public static String userMark = "test";//文件名=mark=用户标识的地址
     private boolean gpsIsActive = false;//判断路测采集器是否已获取到GPS定位信号 true已定位 false 未定位
 
     private CellType cellType;

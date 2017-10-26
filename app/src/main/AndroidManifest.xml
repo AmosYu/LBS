@@ -25,19 +25,25 @@
         android:name=".ui.MyApplication"
         android:theme="@style/AppTheme" >
         <activity android:name=".ui.MainActivity" >
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        </activity>
+
+        <activity android:name=".ui.LoginActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.FileImportActivity" android:screenOrientation="portrait">
 
-        <activity android:name=".ui.LoginActivity" >
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+        </activity>
+        <activity android:name=".ui.OffLineActivity" android:screenOrientation="portrait">
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
         </activity>
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"

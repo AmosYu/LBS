@@ -1,17 +1,11 @@
 package lbs.ctl.lbs.ui;
 
-import android.Manifest;
-
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -88,7 +82,6 @@ public class MainActivity extends Activity implements Observer {
         initCdma();
         initTd();
         initWcdma();
-        initGpsAndLog();
         initListView();
         initTopView();
         initRadioButton();
@@ -453,19 +446,6 @@ public class MainActivity extends Activity implements Observer {
         wifiInfoAdapter = new WifiInfoAdapter(context, wifiList, R.layout.wifi_item);
     }
 
-    private TextView latitudeTv, longitudeTv;
-
-    private void initGpsAndLog() {
-        latitudeTv = (TextView) findViewById(R.id.main_latitude_tv);
-        longitudeTv = (TextView) findViewById(R.id.main_longitude_tv);
-
-    }
-
-    private void updateGps() {
-        latitudeTv.setText("纬度：" + allCellInfo.getLatitude());
-        longitudeTv.setText("经度：" + allCellInfo.getLongitude());
-    }
-
     private TextView devConTv;
     private CheckBox hexCheckBox, ciFourByteCheckBox;
 
@@ -479,6 +459,7 @@ public class MainActivity extends Activity implements Observer {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 cellInfoAdapter.setHex(isChecked);
+                cellInfoAdapter.notifyDataSetChanged();
             }
         });
         ciFourByteCheckBox = (CheckBox) findViewById(R.id.main_checkbox_ci);
@@ -487,6 +468,7 @@ public class MainActivity extends Activity implements Observer {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 cellInfoAdapter.setShortCi(isChecked);
+                cellInfoAdapter.notifyDataSetChanged();
             }
         });
         devConTv = (TextView) findViewById(R.id.main_dev_con_state);
@@ -541,7 +523,7 @@ public class MainActivity extends Activity implements Observer {
     private void updateAllData(CellType type) {
         switch (type) {
             case GPS:
-                updateGps();
+
                 break;
             case GSM_M:
             case GSM_U:
@@ -640,38 +622,12 @@ public class MainActivity extends Activity implements Observer {
 
     private Button saveDataBtn, offlineMapBtn, queryDataBtn, importBtn;
     private Button attentionBtn, uploadBtn, exportBtn, exitBtn;
-    private TextView filaNameTv;
 
     /**
      * 初始换功能按钮
      */
     private void initButton() {
-        exitBtn = (Button)findViewById(R.id.main_exit_btn);
-        exitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new AlertDialog.Builder(context)
-                        .setTitle("程序退出")
-                        .setPositiveButton(android.R.string.ok,
-                                new DialogInterface.OnClickListener() {
 
-                                    @Override
-                                    public void onClick(final DialogInterface dialog,final int which) {
-                                        MyApplication.getInstance().exit();
-                                    }
-                                }).setNegativeButton(android.R.string.cancel, null).show();
-            }
-        });
-        //注意事项
-        attentionBtn = (Button) findViewById(R.id.main_attention_btn);
-        attentionBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent intent = new Intent();
-//                intent.setClass(MainActivity.this, MapActivity.class);
-//                startActivity(intent);
-            }
-        });
         //数据上传
         uploadBtn = (Button) findViewById(R.id.main_upload_btn);
         uploadBtn.setOnClickListener(new View.OnClickListener() {
@@ -683,17 +639,8 @@ public class MainActivity extends Activity implements Observer {
                 startActivity(intent);
             }
         });
-        //离线地图
-        offlineMapBtn = (Button) findViewById(R.id.main_offlinemap_btn);
-        offlineMapBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Intent intent = new Intent();
-//                intent.setClass(context, OffLineActivity.class);
-//                startActivity(intent);
-            }
-        });
-        filaNameTv = (TextView) findViewById(R.id.main_filename_tv);
+
+
         //数据保存
         // mark==文件名==用户标记的地点
         saveDataBtn = (Button) findViewById(R.id.main_data_save_file_btn);
@@ -726,7 +673,6 @@ public class MainActivity extends Activity implements Observer {
                             allCellInfo.setUserMark(mark);
                             allCellInfo.setDataSaveToDb(true);
                             saveDataBtn.setText("停止保存");
-                            filaNameTv.setText("当前数据保存于文件" + allCellInfo.getUserMark() + "中,如需停止保存数据请点击停止保存按钮");
                         }
                     });
                     builder.show();
@@ -743,7 +689,6 @@ public class MainActivity extends Activity implements Observer {
                         public void onClick(DialogInterface dialog, int which) {
                             allCellInfo.setDataSaveToDb(false);
                             saveDataBtn.setText("保存数据");
-                            filaNameTv.setText("数据保存文件名：当前数据未保存，如需保存数据请点击数据保存按钮");
                         }
                     });
                     builder.show();
@@ -756,34 +701,39 @@ public class MainActivity extends Activity implements Observer {
         queryDataBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setClass(context, FindDataActivity.class);
-                startActivity(intent);
+                if(queryDataBtn.getText().toString().equals("显示地图")){
+                    queryDataBtn.setText("显示数据");
+                    mMapView.setVisibility(View.VISIBLE);
+                }
+                else {
+                    queryDataBtn.setText("显示地图");
+                    mMapView.setVisibility(View.INVISIBLE);
+                }
             }
         });
         //导出按钮
-        exportBtn = (Button) findViewById(R.id.main_export_btn);
-        exportBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.putExtra("类型", "导出");
-                intent.setClass(MainActivity.this, FileImportActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        //导入按钮
-        importBtn = (Button) findViewById(R.id.main_import_btn);
-        importBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.putExtra("类型", "导入");
-                intent.setClass(MainActivity.this, FileImportActivity.class);
-                startActivity(intent);
-            }
-        });
+//        exportBtn = (Button) findViewById(R.id.main_export_btn);
+//        exportBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent();
+//                intent.putExtra("类型", "导出");
+//                intent.setClass(MainActivity.this, FileImportActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//
+//        //导入按钮
+//        importBtn = (Button) findViewById(R.id.main_import_btn);
+//        importBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent();
+//                intent.putExtra("类型", "导入");
+//                intent.setClass(MainActivity.this, FileImportActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
     }
 

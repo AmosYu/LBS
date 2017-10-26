@@ -19,36 +19,36 @@
             android:layout_alignParentLeft="true"
             android:src="@drawable/logo" />
 
-
-        <CheckBox
-            android:id="@+id/main_checkbox_ci"
-            android:layout_width="wrap_content"
-            android:text="显示CI后16bit"
-            android:layout_alignParentRight="true"
-            android:textSize="@dimen/text_size_16"
-            android:layout_height="match_parent" />
-        <CheckBox
-            android:id="@+id/main_checkbox_hex"
-            android:layout_toLeftOf="@id/main_checkbox_ci"
-            android:layout_width="wrap_content"
-            android:text="十六进制LAC和CI"
-            android:textSize="@dimen/text_size_16"
-            android:layout_height="match_parent" />
         <TextView
             android:id="@+id/main_dev_con_state"
             android:layout_toRightOf="@id/logo_imageview"
-            android:layout_width="match_parent"
-            android:layout_toLeftOf="@id/main_checkbox_hex"
+            android:layout_width="wrap_content"
             android:text="设备：未连接"
             android:gravity="center|left"
             android:textSize="@dimen/text_size_16"
             android:layout_height="match_parent" />
+        <Button
+            android:id="@+id/main_data_save_file_btn"
+            android:layout_toRightOf="@id/main_dev_con_state"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:text="开始任务"
+            android:layout_height="match_parent" />
+        <Button
+            android:id="@+id/main_query_btn"
+            android:layout_toRightOf="@id/main_data_save_file_btn"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:text="显示地图"
+            android:layout_height="match_parent" />
+
+
     </RelativeLayout>
     <LinearLayout
         android:id="@+id/data_show_liner"
         android:layout_below="@id/main_top_rela"
         android:layout_width="match_parent" android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:orientation="vertical"   android:layout_marginBottom="50dp"
         >
         <LinearLayout
             android:layout_width="fill_parent"
@@ -667,52 +667,6 @@
             android:background="@color/grey_3"
             android:layout_height="1dp" />
         <TextView
-            android:id="@+id/main_filename_tv"
-            android:textSize="@dimen/text_size_14"
-            android:gravity="center|left"
-            android:layout_marginLeft="16dp"
-            android:text="数据保存文件名：当前数据未保存，如需保存数据请点击数据保存按钮"
-            android:layout_width="match_parent"
-            android:background="@color/white"
-            android:layout_height="0dp"         android:layout_weight="1" />
-
-        <LinearLayout
-            android:layout_width="fill_parent" android:layout_height="0dp"         android:layout_weight="1"
-            android:background="@color/blue_1"
-            android:orientation="horizontal">
-            <Button
-                android:id="@+id/main_data_save_file_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="数据保存"
-                android:layout_height="match_parent" />
-            <Button
-                android:id="@+id/main_query_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="轨迹查询"
-                android:layout_height="match_parent" />
-            <Button
-                android:id="@+id/main_import_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="文件导入"
-                android:layout_height="match_parent" />
-            <Button
-                android:id="@+id/main_export_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="文件导出"
-                android:layout_height="match_parent" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_weight="0"
-            android:background="@color/grey_3"
-            android:layout_height="1dp" />
-
-        <TextView
             android:layout_width="match_parent"
             android:layout_weight="0"
             android:background="@color/grey_3"
@@ -720,22 +674,19 @@
         <LinearLayout
             android:layout_width="fill_parent" android:layout_height="0dp"         android:layout_weight="1"
             android:background="@color/white">
-            <TextView
-                android:id="@+id/main_latitude_tv"
-                android:layout_marginLeft="16dp"
+            <CheckBox
+                android:id="@+id/main_checkbox_ci"
+                android:layout_width="wrap_content"
+                android:text="显示CI后16bit"
+                android:layout_alignParentRight="true"
                 android:textSize="@dimen/text_size_16"
-                android:gravity="center|left"
-                android:text="纬度:"
-                android:layout_weight="1"
-                android:layout_width="0dp"
                 android:layout_height="match_parent" />
-            <TextView
-                android:id="@+id/main_longitude_tv"
+            <CheckBox
+                android:id="@+id/main_checkbox_hex"
+                android:layout_toLeftOf="@id/main_checkbox_ci"
+                android:layout_width="wrap_content"
+                android:text="十六进制LAC和CI"
                 android:textSize="@dimen/text_size_16"
-                android:gravity="center|left"
-                android:text="经度:"
-                android:layout_weight="1"
-                android:layout_width="0dp"
                 android:layout_height="match_parent" />
         </LinearLayout>
         <TextView
@@ -743,35 +694,7 @@
             android:layout_weight="0"
             android:background="@color/grey_3"
             android:layout_height="1dp" />
-        <LinearLayout
-            android:layout_width="fill_parent" android:layout_height="0dp"         android:layout_weight="1"
-            android:background="@color/blue3">
-            <Button
-                android:id="@+id/main_attention_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="注意事项"
-                android:layout_height="match_parent" />
-            <Button
-                android:id="@+id/main_upload_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="文件上传"
-                android:layout_height="match_parent" />
 
-            <Button
-                android:id="@+id/main_offlinemap_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="离线地图"
-                android:layout_height="match_parent" />
-            <Button
-                android:id="@+id/main_exit_btn"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:text="退出程序"
-                android:layout_height="match_parent" />
-        </LinearLayout>
 
     </LinearLayout>
 
@@ -780,7 +703,29 @@
         android:id="@+id/bmapView"
         android:layout_below="@id/main_top_rela"
         android:layout_width="match_parent"
+        android:layout_marginBottom="50dp"
         android:layout_height="match_parent"
         android:clickable="true" />
 
+    <LinearLayout
+        android:id="@+id/main_buttom"
+        android:layout_alignParentBottom="true"
+        android:layout_width="fill_parent" android:layout_height="50dp"         android:layout_weight="1"
+        android:background="@color/blue3">
+        <Button
+            android:id="@+id/main_find_bts_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="基站查询"
+            android:layout_height="match_parent" />
+        <Button
+            android:id="@+id/main_upload_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="文件上传"
+            android:layout_height="match_parent" />
+
+
+
+    </LinearLayout>
 </RelativeLayout>
