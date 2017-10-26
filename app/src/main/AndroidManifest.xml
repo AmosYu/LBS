@@ -39,9 +39,11 @@
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         </activity>
+        <activity android:name=".ui.MapFindActivity" >
+        </activity>
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="gFCqM39YRHrbMk4coCZjomaW5jQai4MB" />
+            android:value="Ivc8HCb80vVE7O7Rv2Tuxf47YFLdhB1Y" />
 
         <service
             android:name="com.baidu.location.f"

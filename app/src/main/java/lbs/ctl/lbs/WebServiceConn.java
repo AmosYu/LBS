@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.telephony.TelephonyManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.ksoap2.SoapEnvelope;
@@ -26,10 +27,25 @@ public class WebServiceConn {
      * 192.168.0.185
      */
     private String serverAddress;
-    private String devId = "";
+    private String devId = "000000000000000";
     private String key;
 
     private Context context;
+    public WebServiceConn( Context context,int num) {
+        if (num==0){
+            this.context = context;
+            SharedPreferences sharedPreferences= context.getSharedPreferences("AIRINTERFACE", Activity.MODE_PRIVATE);
+            String ip = sharedPreferences.getString("IP","192.168.1.39");//222.128.36.167
+            String port = sharedPreferences.getString("PORT","80");
+            this.serverAddress = ip+":"+port;
+            this.context = context;
+            TelephonyManager telephonyManager= (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            //根据接口文档验证登陆的时候的devId 和 key 值
+            //分别为手机IMEI和经过MD5加密的key值
+            devId = "000000000000000";
+            key = MD5Utils.toMD5("terminal" + ":" + devId + ":LUCE_SYSTEM_CHECK");
+        }
+    }
     public WebServiceConn( Context context) {
         this.context = context;
         SharedPreferences sharedPreferences= context.getSharedPreferences("AIRINTERFACE", Activity.MODE_PRIVATE);
@@ -101,7 +117,58 @@ public class WebServiceConn {
         return json.toString();
     }
 
+    /**
+     * 查询基站位置
+     * 除CDMA以外的基站位置
+     * @return
+     */
+    public String FindPos(String mcc,String mnc,String lac,String cell){
+        JSONArray array=new JSONArray();
+        try {
+            array.put(0,mcc);
+            array.put(1,mnc);
+            array.put(2,lac);
+            array.put(3,cell);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JSONObject json = new JSONObject();
+        try {
+            json.put("type", "BSLOC");
+            json.put("parameters", array);
+            json.put("token",token);
+        }catch (JSONException ex){}
+        return json.toString();
+    }
 
+    /**
+     * 查询CDMA基站位置
+     * @param mcc
+     * @param mnc
+     * @param sid
+     * @param nid
+     * @param bid
+     * @return
+     */
+    public String FindPos(String mcc,String mnc,String sid,String nid,String bid){
+        JSONArray array=new JSONArray();
+        try {
+            array.put(0,mcc);
+            array.put(1,mnc);
+            array.put(2,sid);
+            array.put(3,nid);
+            array.put(4,bid);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JSONObject json = new JSONObject();
+        try {
+            json.put("type", "BSLOC");
+            json.put("parameters", array);
+            json.put("token",token);
+        }catch (JSONException ex){}
+        return json.toString();
+    }
     /**
      * 向服务器提交数据,并返回响应消息
      * @param  jsonMsg
