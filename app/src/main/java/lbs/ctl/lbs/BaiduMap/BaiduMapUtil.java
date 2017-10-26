@@ -4,7 +4,15 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,23 +71,29 @@ public class BaiduMapUtil {
      * @param num 0红色  1 玫红  2 橘红   强度大小用三种颜色表示
      *            3蓝色  4 红色   用来表示不同途径得到的数据，3代表查询的，4代表采集的
      */
-    public void addMarker(double lat,double lon,int num,String info){
+    public void addMarker(double lat,double lon,int num,String info,float progressR,float progressG,float progressB, float progressA){
         LatLng point = new LatLng(lat, lon);
-        int icon=R.drawable.iconmarka;
-        if (num==0){
-            icon=R.drawable.iconmarka;
-        }else if (num==1){
+        float[] src = new float[]{progressR, 0, 0, 0, 0,
+                0, progressG, 0, 0, 0,
+                0, 0, progressB, 0, 0,
+                0, 0, 0, progressA, 0};
+        Bitmap baseBitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.iconmarka);
+        Bitmap baseBitmap_small = BitmapFactory.decodeResource(context.getResources(),R.drawable.iconmarka222);
+        Bitmap afterBitmap = Bitmap.createBitmap(baseBitmap.getWidth(),baseBitmap.getHeight(), baseBitmap.getConfig());
+        Canvas canvas = new Canvas(afterBitmap);
+        Paint paint = new Paint();
+        // 定义ColorMatrix，并指定RGBA矩阵
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.set(src);
+        // 设置Paint的颜色
+        paint.setColorFilter(new ColorMatrixColorFilter(src));
+        // 通过指定了RGBA矩阵的Paint把原图画到空白图片上
+        canvas.drawBitmap(baseBitmap, 0,0, new Paint());
+        canvas.drawBitmap(baseBitmap_small, new Matrix(), paint);
 
-        }else if (num==2){
-
-        }else if (num==3){
-            icon=R.drawable.green;
-        }else if (num==4){
-            icon=R.drawable.iconmarka;
-        }
         // 构建Marker图标
-        BitmapDescriptor bitmap = BitmapDescriptorFactory
-                .fromResource(icon);
+        BitmapDescriptor bitmap = BitmapDescriptorFactory.fromBitmap(afterBitmap);
+//                .fromResource(icon);
         //构建MarkerOption，用于在地图上添加Marker
         OverlayOptions option = new MarkerOptions()
                 .position(point)

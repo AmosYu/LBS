@@ -242,7 +242,7 @@ public class MapFindActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                baiduMapUtil.addMarker(point.getLat(),point.getLon(),0,point.getAddress());
+                baiduMapUtil.addMarker(point.getLat(),point.getLon(),0,point.getAddress(),255f,0f,0f,1f);
             }
         });
     }
@@ -382,22 +382,22 @@ public class MapFindActivity extends AppCompatActivity {
                         if (jsonObject.has("acc")){
                             if (!((int)lat1==0&&(int)lon1==0)){
                                 end_latLng=new LatLng(latlon[0],latlon[1]);
-                                baiduMapUtil.addMarker(latlon[0],latlon[1],3,"第三方数据");
+                                baiduMapUtil.addMarker(latlon[0],latlon[1],3,"第三方数据",0f,0f,255f,1.0f);
                             }
                         }
                         else if (jsonObject.has("rssi")){
                             //按强度渐变添加覆盖物
-                            if (!((int)lat1==0&&(int)lon1==0)){
-                                baiduMapUtil.addMarker(latlon[0],latlon[1],4,Math.abs(Double.valueOf(point.getRssi()))+"");
-                            }
+//                            if (!((int)lat1==0&&(int)lon1==0)){
+//                                baiduMapUtil.addMarker(latlon[0],latlon[1],4,Math.abs(Double.valueOf(point.getRssi()))+"",255f,0f,0f,1.0f);
+//                            }
                             list_rssi.add(point.getRssi());
                             list.add(point);
                         }
                     }
+                    //按强度渐变添加覆盖物
                     int max_rssi=(int) Math.abs(Double.valueOf(list_rssi.get(0)));
                     int min_rssi=(int) Math.abs(Double.valueOf(list_rssi.get(0)));
                     for (int i=0;i<list_rssi.size()-1;i++){
-                        //按强度渐变添加覆盖物
                         double current=Double.valueOf(list_rssi.get(i));
                         double next=Double.valueOf(list_rssi.get(i+1));
                         if (Math.abs(current)>max_rssi){
@@ -408,6 +408,23 @@ public class MapFindActivity extends AppCompatActivity {
                     }
                     //根据最大小值对每个数算一个百分比，对百分比的区域进行比较，然后区分不同的颜色
                     Log.e("rssi",max_rssi+"   "+min_rssi+"");
+                    for (int i=0;i<list.size();i++){
+                        int rssi= (int) Math.abs(Double.valueOf(list.get(i).getRssi()));
+                        final double[] latlon1= GPSUtils.wgs2bd(Double.valueOf(list.get(i).getLat()),Double.valueOf(list.get(i).getLon()));
+                        if (!((int)latlon1[0]==0&&(int)latlon1[1]==0)){
+                            if (rssi==max_rssi){
+                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",0f,255f,0f,1.0f);
+                            }else if (rssi==min_rssi){
+                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,0f,0f,1.0f);
+                            }else if (max_rssi-rssi<5){
+                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",20f,255f,100f,1.0f);
+                            }else if (rssi-min_rssi<5){
+                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,95f,25f,1.0f);
+                            }else {
+                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,95f,25f,1.0f);
+                            }
+                        }
+                    }
                     for (int i=0;i<list.size();i++){
                         Point point= list.get(i);
                         double lat=Double.valueOf(point.getLat());
