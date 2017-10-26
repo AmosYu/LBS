@@ -1,10 +1,12 @@
 package lbs.ctl.lbs.utils;
 
+import java.io.Serializable;
+
 /**
  * Created by CTL on 2017/10/24.
  */
 
-public class LocationPoint {
+public class LocationPoint implements Serializable{
     private double lat;
     private double lon;
     private String address;

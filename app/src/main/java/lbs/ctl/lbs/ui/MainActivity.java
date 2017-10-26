@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
@@ -50,6 +51,7 @@ import static lbs.ctl.lbs.luce.CellType.LTE;
 import static lbs.ctl.lbs.luce.CellType.WIFI;
 
 public class MainActivity extends Activity implements Observer {
+    private ImageView logo_view;
     private MapView mMapView = null;
     private BaiduMap mBaiduMap=null;
     private LocationService locationService=null;
@@ -120,6 +122,18 @@ public class MainActivity extends Activity implements Observer {
 
     private void initView() {
         mMapView=(MapView) findViewById(R.id.bmapView);
+
+        logo_view=(ImageView)findViewById(R.id.logo_imageview);
+        logo_view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,MapFindActivity.class);
+                intent.putExtra("point",point);
+//                Bundle bundle=new Bundle();
+//                bundle.put
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

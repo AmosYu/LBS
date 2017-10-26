@@ -3,6 +3,20 @@ package lbs.ctl.lbs.BaiduMap;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
@@ -27,9 +41,11 @@ import com.baidu.mapapi.utils.OpenClientUtil;
 import com.baidu.mapapi.utils.route.BaiduMapRoutePlan;
 import com.baidu.mapapi.utils.route.RouteParaOption;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lbs.ctl.lbs.R;
+import lbs.ctl.lbs.ui.MapFindActivity;
 
 /**
  * Created by CTL on 2017/10/24.
@@ -52,21 +68,32 @@ public class BaiduMapUtil {
      * 往地图上添加marker
      * @param lat
      * @param lon
-     * @param num 0红色  1 橘色  2 灰色
+     * @param num 0红色  1 玫红  2 橘红   强度大小用三种颜色表示
+     *            3蓝色  4 红色   用来表示不同途径得到的数据，3代表查询的，4代表采集的
      */
-    private void addMarker(double lat,double lon,int num){
+    public void addMarker(double lat,double lon,int num,String info,float progressR,float progressG,float progressB, float progressA){
         LatLng point = new LatLng(lat, lon);
-        int icon=R.drawable.iconmarka;
-        if (num==0){
-            icon=R.drawable.iconmarka;
-        }else if (num==1){
+        float[] src = new float[]{progressR, 0, 0, 0, 0,
+                0, progressG, 0, 0, 0,
+                0, 0, progressB, 0, 0,
+                0, 0, 0, progressA, 0};
+        Bitmap baseBitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.iconmarka);
+        Bitmap baseBitmap_small = BitmapFactory.decodeResource(context.getResources(),R.drawable.iconmarka222);
+        Bitmap afterBitmap = Bitmap.createBitmap(baseBitmap.getWidth(),baseBitmap.getHeight(), baseBitmap.getConfig());
+        Canvas canvas = new Canvas(afterBitmap);
+        Paint paint = new Paint();
+        // 定义ColorMatrix，并指定RGBA矩阵
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.set(src);
+        // 设置Paint的颜色
+        paint.setColorFilter(new ColorMatrixColorFilter(src));
+        // 通过指定了RGBA矩阵的Paint把原图画到空白图片上
+        canvas.drawBitmap(baseBitmap, 0,0, new Paint());
+        canvas.drawBitmap(baseBitmap_small, new Matrix(), paint);
 
-        }else if (num==2){
-
-        }
-        //构建Marker图标
-        BitmapDescriptor bitmap = BitmapDescriptorFactory
-                .fromResource(icon);
+        // 构建Marker图标
+        BitmapDescriptor bitmap = BitmapDescriptorFactory.fromBitmap(afterBitmap);
+//                .fromResource(icon);
         //构建MarkerOption，用于在地图上添加Marker
         OverlayOptions option = new MarkerOptions()
                 .position(point)
@@ -81,19 +108,31 @@ public class BaiduMapUtil {
         //改变地图状态
         mBaiduMap.setMapStatus(mMapStatusUpdate);
         //在地图上添加Marker，并显示
-        mBaiduMap.addOverlay(option);
+        Marker marker= (Marker) mBaiduMap.addOverlay(option);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("info", info);
+        marker.setExtraInfo(bundle);
+    }
+    private Bitmap getBitmapFromView(View view) {
+        view.destroyDrawingCache();
+        view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.UNSPECIFIED);
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        view.setDrawingCacheEnabled(true);
+        Bitmap bitmap = view.getDrawingCache();
+        return bitmap;
     }
 
     /**
      * 往地图上添加一个覆盖物
      * @param latLngs
      */
-    private void draw_find(List<LatLng> latLngs){
+    public void draw_find(List<LatLng> latLngs){
         OverlayOptions polygonOption = new PolygonOptions()
                 .points(latLngs)
-                .stroke(new Stroke(5, 0xAA00FF00))
-                .fillColor(0xAAFFFF00);
+                .stroke(new Stroke(5, 0xff00ffff))
+                .fillColor(0xffffff00);
         mBaiduMap.addOverlay(polygonOption);
+        MapFindActivity.showList.add(polygonOption);
     }
 
     /**
@@ -101,7 +140,7 @@ public class BaiduMapUtil {
      * @param showList 添加地图的云层
      * 多个覆盖物颜色不同   可以设置每个OverlayOptions的颜色不同
      */
-    private void add_more_overlay(final List<OverlayOptions> showList){
+    public void add_more_overlay(final List<OverlayOptions> showList){
         OverlayManager manager = new OverlayManager(mBaiduMap) {
             @Override
             public List<OverlayOptions> getOverlayOptions() {
@@ -119,7 +158,7 @@ public class BaiduMapUtil {
             }
         };
         manager.addToMap();//添加到地图
-        manager.zoomToSpan();//自动缩放到合适比例
+//        manager.zoomToSpan();//自动缩放到合适比例
     }
     /**
      *启动百度地图导航
@@ -127,11 +166,11 @@ public class BaiduMapUtil {
      * @param star_latLng  起点经纬度
      * @param end_latlng   终点经纬度
      */
-    private void launchNavigator(String star_address,LatLng star_latLng,LatLng end_latlng){
+    public void launchNavigator(String star_address,LatLng star_latLng,LatLng end_latlng){
         //起点
         String star_add=star_address;
         //终点
-        final String[] end_add = {""};
+        final String[] end_add = {"",""};
         GeoCoder geoCoder = GeoCoder.newInstance();
         // 设置反地理经纬度坐标,请求位置时,需要一个经纬度
         geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(end_latlng));
@@ -143,7 +182,7 @@ public class BaiduMapUtil {
 
             @Override
             public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
-
+                end_add[1] =reverseGeoCodeResult.getAddress();
             }
         });
         RouteParaOption routeParaOption=new RouteParaOption();
@@ -165,7 +204,7 @@ public class BaiduMapUtil {
      * @param address
      * @return
      */
-    private LatLng AddressToLatLng(String city,String address){
+    public LatLng AddressToLatLng(String city,String address){
         final LatLng[] latLng = {null};
         geoCoder.geocode(new GeoCodeOption().city(city).address(address));
         geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
@@ -187,7 +226,7 @@ public class BaiduMapUtil {
      * @param latLng
      * @return
      */
-    private String LatLngToAddress(LatLng latLng){
+    public String LatLngToAddress(LatLng latLng){
         final String[] address = {""};
         geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(latLng));
         geoCoder.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
