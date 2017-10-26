@@ -14,6 +14,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -78,8 +79,8 @@ public class BaiduMapUtil {
                 0, 0, progressB, 0, 0,
                 0, 0, 0, progressA, 0};
         Bitmap baseBitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.iconmarka);
-        Bitmap baseBitmap_small = BitmapFactory.decodeResource(context.getResources(),R.drawable.iconmarka222);
-        Bitmap afterBitmap = Bitmap.createBitmap(baseBitmap.getWidth(),baseBitmap.getHeight(), baseBitmap.getConfig());
+        Bitmap baseBitmap_small = BitmapFactory.decodeResource(context.getResources(),R.drawable.iconn);
+        Bitmap afterBitmap = Bitmap.createBitmap(baseBitmap.getWidth(),baseBitmap.getHeight(),Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(afterBitmap);
         Paint paint = new Paint();
         // 定义ColorMatrix，并指定RGBA矩阵

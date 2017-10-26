@@ -421,7 +421,7 @@ public class MapFindActivity extends AppCompatActivity {
                             }else if (rssi-min_rssi<5){
                                 baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,95f,25f,1.0f);
                             }else {
-                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,95f,25f,1.0f);
+                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",241f,255f,183f,1.0f);
                             }
                         }
                     }
