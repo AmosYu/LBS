@@ -395,34 +395,38 @@ public class MapFindActivity extends AppCompatActivity {
                         }
                     }
                     //按强度渐变添加覆盖物
-                    int max_rssi=(int) Math.abs(Double.valueOf(list_rssi.get(0)));
-                    int min_rssi=(int) Math.abs(Double.valueOf(list_rssi.get(0)));
+                    int max_rssi=Integer.valueOf(list_rssi.get(0));
+                    int min_rssi=Integer.valueOf(list_rssi.get(0));
                     for (int i=0;i<list_rssi.size()-1;i++){
-                        double current=Double.valueOf(list_rssi.get(i));
-                        double next=Double.valueOf(list_rssi.get(i+1));
-                        if (Math.abs(current)>max_rssi){
-                            max_rssi=(int) Math.abs(current);
-                        } else if (Math.abs(current)<min_rssi){
-                            min_rssi=(int) Math.abs(current);
+                        int current=Integer.valueOf(list_rssi.get(i));
+                        int next=Integer.valueOf(list_rssi.get(i+1));
+                        if (current>max_rssi){
+                            max_rssi=current;
+                        } else if (current<min_rssi){
+                            min_rssi=current;
                         }
                     }
                     //根据最大小值对每个数算一个百分比，对百分比的区域进行比较，然后区分不同的颜色
+                    // "("+(100-this._rssi)*255/100 + ","+this._rssi*255/100 +",0)"
+                    // var rssi = (json[i].data[0].power - minrssi)*100/(maxrssi-minrssi);
                     Log.e("rssi",max_rssi+"   "+min_rssi+"");
                     for (int i=0;i<list.size();i++){
                         int rssi= (int) Math.abs(Double.valueOf(list.get(i).getRssi()));
+                        int rssi_rgb=(Integer.valueOf(list.get(i).getRssi())-min_rssi)*100/(max_rssi-min_rssi);
                         final double[] latlon1= GPSUtils.wgs2bd(Double.valueOf(list.get(i).getLat()),Double.valueOf(list.get(i).getLon()));
                         if (!((int)latlon1[0]==0&&(int)latlon1[1]==0)){
-                            if (rssi==max_rssi){
-                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",0f,255f,0f,1.0f);
-                            }else if (rssi==min_rssi){
-                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,0f,0f,1.0f);
-                            }else if (max_rssi-rssi<5){
-                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",20f,255f,100f,1.0f);
-                            }else if (rssi-min_rssi<5){
-                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,95f,25f,1.0f);
-                            }else {
-                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",241f,255f,183f,1.0f);
-                            }
+                            baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",(100-rssi_rgb)*255/100 ,rssi_rgb*255/100,0f,1.0f);
+//                            if (rssi==max_rssi){
+//                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",0f,255f,0f,1.0f);
+//                            }else if (rssi==min_rssi){
+//                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,0f,0f,1.0f);
+//                            }else if (max_rssi-rssi<5){
+//                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",20f,255f,100f,1.0f);
+//                            }else if (rssi-min_rssi<5){
+//                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,95f,25f,1.0f);
+//                            }else {
+//                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",241f,255f,183f,1.0f);
+//                            }
                         }
                     }
                     for (int i=0;i<list.size();i++){
@@ -708,26 +712,6 @@ public class MapFindActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mMapView.onPause();
-    }
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK&& event.getAction() == KeyEvent.ACTION_DOWN)
-        {
-            new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.title_dialog_exit_confirm))
-                    .setMessage(getString(R.string.message_confirm_to_exit))
-                    .setPositiveButton(android.R.string.ok,
-                            new android.content.DialogInterface.OnClickListener()
-                            {
-                                public void onClick(final DialogInterface dialog, final int which)
-                                {
-                                    MyApplication.getInstance().exit();
-                                }
-                            }).setNegativeButton(android.R.string.cancel, null).show();
-
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
 //    private BDLocationListener mListener = new BDLocationListener() {
 //
