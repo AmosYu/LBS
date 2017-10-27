@@ -9,14 +9,19 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.baidu.mapapi.model.LatLng;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import lbs.ctl.lbs.luce.AllCellInfo;
 import lbs.ctl.lbs.luce.CellType;
 import lbs.ctl.lbs.luce.LuceCellInfo;
+import lbs.ctl.lbs.utils.Gps2BaiDu;
 
 
 public class DbAcessImpl implements DbAccess {
@@ -357,6 +362,24 @@ public class DbAcessImpl implements DbAccess {
     }
 
     /**
+     * 根据文件名查询所有数据
+     * @param filename
+     * @return
+     */
+    public LinkedList<LatLng> selectByFileGetPoint(String filename){
+        LinkedList<LatLng> list=new LinkedList<>();
+        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where userRemark=?",
+                new String[]{filename});
+        Log.e("mytag",cursor.getCount()+"");
+        while(cursor.moveToNext()){
+            LatLng latLng = Gps2BaiDu.gpsToBaidu(cursor.getDouble(4),cursor.getDouble(5));
+            list.add(latLng);
+        }
+        return list;
+    }
+
+
+    /**
      * 根据文件名和类型进行查询
      * @param filename
      * @param type
@@ -535,7 +558,10 @@ public class DbAcessImpl implements DbAccess {
     }
     public void saveInDbA(ArrayList<LuceCellInfo> cellInfos, boolean isCdma ){
         for(LuceCellInfo luceCellInfo:cellInfos){
-            if(luceCellInfo.getCellType().equals("主小区"))
+//            if(luceCellInfo.getCellType().equals("主小区"))
+            if(luceCellInfo.getLatitude()==0.0||luceCellInfo.getLongitude()==0.0)
+                continue;
+            if((luceCellInfo.getLac_sid()!=0&&luceCellInfo.getLac_sid()!=65535)&&(luceCellInfo.getCi_nid()!=0))
                 insertCellMapInfo(luceCellInfo, DbAccess.USER_COLLECTION);
 
         }

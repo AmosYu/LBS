@@ -2,16 +2,21 @@ package lbs.ctl.lbs.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -20,16 +25,27 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.Poi;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MapStatus;
+import com.baidu.mapapi.map.MapStatusUpdate;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.utils.DistanceUtil;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -42,6 +58,7 @@ import lbs.ctl.lbs.luce.CellType;
 import lbs.ctl.lbs.luce.LuceCellInfo;
 import lbs.ctl.lbs.luce.RevThread;
 import lbs.ctl.lbs.luce.WifiInfo;
+import lbs.ctl.lbs.utils.Gps2BaiDu;
 import lbs.ctl.lbs.utils.LocationPoint;
 import lbs.ctl.lbs.BaiduMap.LocationService;
 
@@ -70,7 +87,9 @@ public class MainActivity extends Activity implements Observer {
      */
     private AllCellInfo allCellInfo;
 
+    private ProgressDialog progressDialog;
 
+    private View mapRelaView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,8 +118,21 @@ public class MainActivity extends Activity implements Observer {
 
         initView();
         initMap();
-        mMapView.setVisibility(View.INVISIBLE);
+        mapRelaView.setVisibility(View.INVISIBLE);
         GetMyLocation();
+
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("正在初始化当前任务的轨迹，请稍等！");
+
+        startTaskBtn.post(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.show();
+                initTrackList(AllCellInfo.userMark);
+                progressDialog.cancel();
+
+            }
+        });
     }
 
     private void GetMyLocation() {
@@ -122,7 +154,7 @@ public class MainActivity extends Activity implements Observer {
 
     private void initView() {
         mMapView=(MapView) findViewById(R.id.bmapView);
-
+        mapRelaView = findViewById(R.id.main_map_rela);
         logo_view=(ImageView)findViewById(R.id.logo_imageview);
         logo_view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -306,6 +338,14 @@ public class MainActivity extends Activity implements Observer {
             devConTv.post(new Runnable() {
                 @Override
                 public void run() {
+                    if(((CellType)data)==CellType.GPS&&allCellInfo.isDataSaveToDb()){
+                        if(allCellInfo.getLatitude()!=0||allCellInfo.getLongitude()!=0) {
+                            LatLng latLng = Gps2BaiDu.gpsToBaidu(allCellInfo.getLatitude(), allCellInfo.getLongitude());
+                            boolean add = addPointToTrackList(latLng);
+                            if(add)
+                                addMarkOnMap(latLng);
+                        }
+                    }
                     updateAllData((CellType) data);
                 }
             });
@@ -331,6 +371,7 @@ public class MainActivity extends Activity implements Observer {
                 @Override
                 public void run() {
                     devConTv.setText(state.toString());
+                    startTaskBtn.setEnabled(state==BluetoothState.CONNECTED);
                 }
             });
         }
@@ -634,121 +675,176 @@ public class MainActivity extends Activity implements Observer {
     }
 
 
-    private Button saveDataBtn, offlineMapBtn, queryDataBtn, importBtn;
-    private Button attentionBtn, uploadBtn, exportBtn, exitBtn;
-
+    private Button startTaskBtn,dataMapSwitchBtn,showFindBtsBtn;
     /**
      * 初始换功能按钮
      */
     private void initButton() {
 
-        //数据上传
-        uploadBtn = (Button) findViewById(R.id.main_upload_btn);
-        uploadBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.putExtra("类型", "上传");
-                intent.setClass(MainActivity.this, FileImportActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
-        //数据保存
-        // mark==文件名==用户标记的地点
-        saveDataBtn = (Button) findViewById(R.id.main_data_save_file_btn);
-        saveDataBtn.setOnClickListener(new View.OnClickListener() {
+        startTaskBtn = (Button) findViewById(R.id.main_start_task_btn);
+        startTaskBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!allCellInfo.isDataSaveToDb()) {
-                    final EditText input = new EditText(context);
-                    input.setMaxLines(1);
-                    String userMark = allCellInfo.getCurrentTime();
-                    input.setText(userMark);
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle("添加文件名")
-                            .setMessage("请在下框中输入文件名，数据保存于此文件中，文件名只能包含是中文、字母、数字。\r\n默认情况采用当前时间命名。")
-                            .setIcon(android.R.drawable.ic_dialog_info)
-                            .setView(input)
-                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
-                    builder.setPositiveButton("保存", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            String mark = input.getText().toString();
-                            if (mark.length() == 0) {
-                                mark = allCellInfo.getCurrentTime();
-                            }
-                            DbAcessImpl dbAcess = DbAcessImpl.getDbInstance(context);
-                            dbAcess.insertMark(mark);
-                            allCellInfo.setUserMark(mark);
-                            allCellInfo.setDataSaveToDb(true);
-                            saveDataBtn.setText("停止保存");
-                        }
-                    });
-                    builder.show();
+                    allCellInfo.setDataSaveToDb(true);
+                    startTaskBtn.setText("停止任务");
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle("停止保存数据")
-                            .setIcon(android.R.drawable.ic_dialog_info)
-                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            });
-                    builder.setPositiveButton("停止", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            allCellInfo.setDataSaveToDb(false);
-                            saveDataBtn.setText("保存数据");
-                        }
-                    });
-                    builder.show();
+                    allCellInfo.setDataSaveToDb(false);
+                    startTaskBtn.setText("开始任务");
                 }
             }
         });
 
         //轨迹与查询
-        queryDataBtn = (Button) findViewById(R.id.main_query_btn);
-        queryDataBtn.setOnClickListener(new View.OnClickListener() {
+        dataMapSwitchBtn = (Button) findViewById(R.id.main_show_map_btn);
+        dataMapSwitchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(queryDataBtn.getText().toString().equals("显示地图")){
-                    queryDataBtn.setText("显示数据");
+                if(dataMapSwitchBtn.getText().toString().equals("显示地图")){
+                    dataMapSwitchBtn.setText("显示数据");
                     mMapView.setVisibility(View.VISIBLE);
                 }
                 else {
-                    queryDataBtn.setText("显示地图");
+                    dataMapSwitchBtn.setText("显示地图");
                     mMapView.setVisibility(View.INVISIBLE);
                 }
             }
         });
-        //导出按钮
-//        exportBtn = (Button) findViewById(R.id.main_export_btn);
-//        exportBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent();
-//                intent.putExtra("类型", "导出");
-//                intent.setClass(MainActivity.this, FileImportActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-//
-//        //导入按钮
-//        importBtn = (Button) findViewById(R.id.main_import_btn);
-//        importBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent();
-//                intent.putExtra("类型", "导入");
-//                intent.setClass(MainActivity.this, FileImportActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+
+        showFindBtsBtn = (Button)findViewById(R.id.main_find_bts_btn);
+        showFindBtsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(context,MapFindActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private LinkedList<LatLng>  trackList = new LinkedList<>();
+    private LinkedList<LuceCellInfo>  btsList = new LinkedList<>();
+
+
+    private boolean addPointToTrackList(LatLng point){
+
+        if(trackList.size()==0){
+            trackList.add(point);
+            return true;
+        }
+        else{
+            if(isEnableAdd(point)) {
+                trackList.add(point);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否能将坐标点添加至轨迹集合，20米内不添加，20米外添加
+     * @param latLng
+     * @return
+     */
+    private boolean isEnableAdd(LatLng latLng){
+        for(LatLng latLngInList:trackList){
+            if(DistanceUtil.getDistance(latLng,latLngInList)<20){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //将可显示的点添加至地图上
+    private void addMarkOnMap(LatLng latLng){
+        BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(R.drawable.iconmarka);
+        //构建MarkerOption，用于在地图上添加Marker
+        OverlayOptions option = new MarkerOptions().position(latLng).icon(bitmap);
+        //定义地图状态
+        MapStatus mMapStatus = new MapStatus.Builder().target(latLng).zoom(18).build();
+        //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
+        MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+        //改变地图状态
+        mBaiduMap.setMapStatus(mMapStatusUpdate);
+        //在地图上添加Marker，并显示
+        mBaiduMap.addOverlay(option);
+    }
+
+    private void initTrackList(String taskName){
+
+        DbAcessImpl db=DbAcessImpl.getDbInstance(context);
+
+        LinkedList<LatLng> list = new LinkedList<>();
+
+        list.addAll(db.selectByFileGetPoint(taskName));
+
+        for(LatLng latLng:list){
+            addPointToMap(latLng);
+        }
+    }
+
+
+    /**
+     * 添加坐标点到地图上
+     * @param latLng
+     */
+    private void addPointToMap(LatLng latLng){
+        boolean add = addPointToTrackList(latLng);
+        if(add)
+            addMarkOnMap(latLng);
+    }
+
+
+    private Spinner modeSpinner;
+    private String showBtsType = "全部";
+    private ArrayAdapter<String> typeSpinnerAdapter;
+    private void initMapTopView() {
+
+        modeSpinner=(Spinner)findViewById(R.id.spinner_marker_type);
+        Resources res = getResources ();
+        String[] modes = res.getStringArray(R.array.mode_arrays);
+        typeSpinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, modes);
+        typeSpinnerAdapter.setDropDownViewResource(R.layout.drop_down_item);
+        modeSpinner.setAdapter(typeSpinnerAdapter);
+        modeSpinner.setOnItemSelectedListener(typeLis);
 
     }
+
+    AdapterView.OnItemSelectedListener typeLis = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            switch (i){
+                case 0:
+                    showBtsType = "全部";
+                    break;
+                case 1:
+                    showBtsType = CellType.GSM_M.toString();
+                    break;
+                case 2:
+                    showBtsType = CellType.GSM_U.toString();
+                    break;
+                case 3:
+                    showBtsType = CellType.WCDMA.toString();
+                    break;
+                case 4:
+                    showBtsType = CellType.CDMA.toString();
+                    break;
+                case 5:
+                    showBtsType = CellType.TDSCDMA.toString();
+                    break;
+                case 6:
+                    showBtsType = CellType.LTE.toString();
+                    break;
+            }
+
+
+        }
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+
+        }
+    };
+
+
 
 }

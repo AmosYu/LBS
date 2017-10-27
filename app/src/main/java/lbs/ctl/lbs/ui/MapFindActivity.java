@@ -709,26 +709,26 @@ public class MapFindActivity extends AppCompatActivity {
         super.onPause();
         mMapView.onPause();
     }
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK&& event.getAction() == KeyEvent.ACTION_DOWN)
-        {
-            new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.title_dialog_exit_confirm))
-                    .setMessage(getString(R.string.message_confirm_to_exit))
-                    .setPositiveButton(android.R.string.ok,
-                            new android.content.DialogInterface.OnClickListener()
-                            {
-                                public void onClick(final DialogInterface dialog, final int which)
-                                {
-                                    MyApplication.getInstance().exit();
-                                }
-                            }).setNegativeButton(android.R.string.cancel, null).show();
-
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode == KeyEvent.KEYCODE_BACK&& event.getAction() == KeyEvent.ACTION_DOWN)
+//        {
+//            new AlertDialog.Builder(this)
+//                    .setTitle(getString(R.string.title_dialog_exit_confirm))
+//                    .setMessage(getString(R.string.message_confirm_to_exit))
+//                    .setPositiveButton(android.R.string.ok,
+//                            new android.content.DialogInterface.OnClickListener()
+//                            {
+//                                public void onClick(final DialogInterface dialog, final int which)
+//                                {
+//                                    MyApplication.getInstance().exit();
+//                                }
+//                            }).setNegativeButton(android.R.string.cancel, null).show();
+//
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 //    private BDLocationListener mListener = new BDLocationListener() {
 //
 //        @Override

@@ -6,13 +6,13 @@
 
 
     <string-array name="mode_arrays">
-        <item>全部</item>
-        <item>G移动</item>
-        <item>G联通</item>
+        <item>仅显示轨迹</item>
+        <item>GSM移动</item>
+        <item>GSM联通</item>
         <item>WCDMA</item>
         <item>CDMA</item>
-        <item>TD</item>
-        <item>LTE</item>
+        <item>TD-SCDMA</item>
+        <item>LTE移动</item>
     </string-array>
 
     <string name="attention_1">注意事项一.与采集器连接\r\n\r\n使用软件前应先确定PAD是否与采集器进行了蓝牙配对，且每个PAD只能与一个采集器配对。\r\n\r\n如果PAD与其它采集器也进行了蓝牙配对请将其取消。</string>

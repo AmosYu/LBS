@@ -110,7 +110,7 @@ public class RevThread implements Runnable {
                     latitude = parseGps.getLatitude();
                     longitude = parseGps.getLongitude();
                 }else {
-                    if(MainActivity.baiduLongitude!=0&& MainActivity.baiduLatitude!=0){
+                    if(MainActivity.baiduLongitude!=0.0&& MainActivity.baiduLatitude!=0.0){
                         LatLng point = Gps2BaiDu.baiduToGps(MainActivity.baiduLatitude,MainActivity.baiduLongitude);
                         BigDecimal lat =  new BigDecimal(point.latitude);
                         BigDecimal longi =  new BigDecimal(point.longitude);

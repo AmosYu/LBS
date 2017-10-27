@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,7 +44,7 @@ public class LoginActivity extends Activity {
     private Button newTaskCenterBtn;
 
 
-    private Button uploadBtn, exportBtn,offlineMapBtn,importBtn;
+    private Button uploadBtn, exportBtn,offlineMapBtn,importBtn,findBtsBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,11 @@ public class LoginActivity extends Activity {
 //        new LbsProDialog(context,"1232123",list).show();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
 
     private void initData() {
         filenameList = new ArrayList<>();
@@ -73,12 +79,23 @@ public class LoginActivity extends Activity {
         {
             HashMap<String,String> map = new HashMap<String,String>();
             map.put("NAME",name);
+            filenameList.add(map);
         }
     }
 
 
 
     private void initBtn(){
+        findBtsBtn = (Button)findViewById(R.id.login_find_bts_btn);
+        findBtsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(context,MapFindActivity.class);
+                startActivity(intent);
+            }
+        });
+
         uploadBtn = (Button) findViewById(R.id.login_upload_btn);
         uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override

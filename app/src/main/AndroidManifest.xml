@@ -24,15 +24,11 @@
         android:supportsRtl="true"
         android:name=".ui.MyApplication"
         android:theme="@style/AppTheme" >
-        <activity android:name=".ui.MainActivity" >
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+        <activity android:name=".ui.MainActivity" android:screenOrientation="portrait">
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
         </activity>
 
-        <activity android:name=".ui.LoginActivity" >
+        <activity android:name=".ui.LoginActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,11 +41,11 @@
         <activity android:name=".ui.OffLineActivity" android:screenOrientation="portrait">
 
         </activity>
-        <activity android:name=".ui.MapFindActivity" >
+        <activity android:name=".ui.MapFindActivity" android:screenOrientation="portrait">
         </activity>
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="Ivc8HCb80vVE7O7Rv2Tuxf47YFLdhB1Y" />
+            android:value="gFCqM39YRHrbMk4coCZjomaW5jQai4MB" />
 
         <service
             android:name="com.baidu.location.f"
