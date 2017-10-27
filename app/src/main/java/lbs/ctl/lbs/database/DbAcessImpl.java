@@ -23,6 +23,8 @@ import lbs.ctl.lbs.luce.CellType;
 import lbs.ctl.lbs.luce.LuceCellInfo;
 import lbs.ctl.lbs.utils.Gps2BaiDu;
 
+import static android.database.sqlite.SQLiteDatabase.openOrCreateDatabase;
+
 
 public class DbAcessImpl implements DbAccess {
 
@@ -408,7 +410,32 @@ public class DbAcessImpl implements DbAccess {
 //        db.close();
         return list;
     }
+    //从手机文件中查询数据
+    @Override
+    public ArrayList<String> FindPos(String mnc, String lac, String cellid) {
+        ArrayList<String> list = new ArrayList<>();
+        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "db" + File.separator ,"db.db");
+        if (file.exists()){
+            SQLiteDatabase rizhi = openOrCreateDatabase(file,null);
+            Cursor cursor = rizhi.rawQuery("select lat,lon from cellinfo where mnc =? and lac =? and ci =? " ,
+                    new String[]{mnc, lac, cellid});
 
+            while (cursor.moveToNext()){
+                double latitude = cursor.getDouble(0);
+                double longitude = cursor.getDouble(1);
+                list.add(latitude + "");
+                list.add(longitude + "");
+            }
+        }
+        return list;
+    }
+    /**
+     * 查询本地数据库
+     * @param lac_sid
+     * @param ci_nid
+     * @param type
+     * @return
+     */
     public List<LuceCellInfo> findBtsUseId(String lac_sid, String ci_nid, CellType type){
         List<LuceCellInfo> list=new ArrayList<>();
         String cellType = type.toString();
@@ -431,7 +458,13 @@ public class DbAcessImpl implements DbAccess {
         }
         return list;
     }
-
+    /**
+     * 查询本地数据库
+     * @param lac_sid
+     * @param ci_nid
+     * @param type
+     * @return
+     */
     public List<LuceCellInfo> findOnlySameLacBts(String lac_sid,String ci_nid,CellType type){
         List<LuceCellInfo> list=new ArrayList<>();
         String cellType = type.toString();
@@ -456,7 +489,12 @@ public class DbAcessImpl implements DbAccess {
     }
 
 
-
+    /**
+     * 查询本地数据库
+     * @param lac_sid
+     * @param ci_nid
+     * @return
+     */
     public List<LuceCellInfo> findBtsUseId(String lac_sid, String ci_nid, String bid){
         List<LuceCellInfo> list=new ArrayList<>();
         String cellType = CellType.CDMA.toString();

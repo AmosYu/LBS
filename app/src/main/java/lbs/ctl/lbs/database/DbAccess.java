@@ -65,6 +65,8 @@ public interface  DbAccess {
      */
     List<Map<String,Object>> selectByFile(String filename);
     public List<Map<String,Object>> selectByNameAndType(String filename, String type);
+    //根据LAC值和CELL值 查询出对应的基站经纬度
+    ArrayList<String> FindPos(String mnc,String lac, String cellid);
 
     /**
      * 当前只为测试使用

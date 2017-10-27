@@ -14,6 +14,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -68,18 +69,16 @@ public class BaiduMapUtil {
      * 往地图上添加marker
      * @param lat
      * @param lon
-     * @param num 0红色  1 玫红  2 橘红   强度大小用三种颜色表示
-     *            3蓝色  4 红色   用来表示不同途径得到的数据，3代表查询的，4代表采集的
      */
-    public void addMarker(double lat,double lon,int num,String info,float progressR,float progressG,float progressB, float progressA){
+    public void addMarker(double lat,double lon,String info,float progressR,float progressG,float progressB, float progressA){
         LatLng point = new LatLng(lat, lon);
         float[] src = new float[]{progressR, 0, 0, 0, 0,
                 0, progressG, 0, 0, 0,
                 0, 0, progressB, 0, 0,
                 0, 0, 0, progressA, 0};
         Bitmap baseBitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.iconmarka);
-        Bitmap baseBitmap_small = BitmapFactory.decodeResource(context.getResources(),R.drawable.iconmarka222);
-        Bitmap afterBitmap = Bitmap.createBitmap(baseBitmap.getWidth(),baseBitmap.getHeight(), baseBitmap.getConfig());
+        Bitmap baseBitmap_small = BitmapFactory.decodeResource(context.getResources(),R.drawable.iconn);
+        Bitmap afterBitmap = Bitmap.createBitmap(baseBitmap.getWidth(),baseBitmap.getHeight(),Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(afterBitmap);
         Paint paint = new Paint();
         // 定义ColorMatrix，并指定RGBA矩阵
@@ -130,7 +129,7 @@ public class BaiduMapUtil {
         OverlayOptions polygonOption = new PolygonOptions()
                 .points(latLngs)
                 .stroke(new Stroke(5, 0xff00ffff))
-                .fillColor(0xffffff00);
+                .fillColor(0x80ffffff);//0xffffff00
         mBaiduMap.addOverlay(polygonOption);
         MapFindActivity.showList.add(polygonOption);
     }
