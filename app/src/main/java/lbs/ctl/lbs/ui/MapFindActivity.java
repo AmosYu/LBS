@@ -1,5 +1,6 @@
 package lbs.ctl.lbs.ui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -49,12 +51,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import lbs.ctl.lbs.BaiduMap.BaiduMapUtil;
 import lbs.ctl.lbs.BaiduMap.ConvexHull;
 import lbs.ctl.lbs.BaiduMap.LocationService;
 import lbs.ctl.lbs.R;
 import lbs.ctl.lbs.WebServiceConn;
+import lbs.ctl.lbs.database.DbAcessImpl;
 import lbs.ctl.lbs.luce.LuceCellInfo;
 import lbs.ctl.lbs.utils.AlrDialog_Show;
 import lbs.ctl.lbs.utils.GPSUtils;
@@ -85,10 +90,13 @@ public class MapFindActivity extends AppCompatActivity {
     private Button daohang_Btn;
     private Button clear_Btn;
     private Button pos_Btn;
+    private ListView listView;
     private EditText lac_edit;
     private EditText cell_edit;
     private EditText bid_edit;
     private CheckBox hex_mode;
+    private LacDataAdapter lacDataAdapter;
+    private PopupWindow mPopWindow;
 
     int mode_index=0;
     String mcc="460";
@@ -109,6 +117,7 @@ public class MapFindActivity extends AppCompatActivity {
     private int[] color={0xffff0000,0xff00ff00,0xff0000ff,0xffffff00,0xff00ffff,0xffff00ff};
     private List<LuceCellInfo> luceCellInfos=new ArrayList<>();
     private LatLng end_latLng=null;
+    private DbAcessImpl impl=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,22 +128,11 @@ public class MapFindActivity extends AppCompatActivity {
         conn=new WebServiceConn(context,0);
         Intent intent=getIntent();
         point = (LocationPoint) intent.getSerializableExtra("point");
+        impl=DbAcessImpl.getDbInstance(context);
 
         initView();
         initMap();
-//        GetMyLocation();
     }
-//
-//    private void GetMyLocation() {
-//        new Thread(new Runnable() {
-//            public void run() {
-//                locationService = ((MyApplication)context.getApplicationContext()).locationService;
-//                locationService.registerListener(mListener);
-//                locationService.setLocationOption(locationService.getDefaultLocationClientOption());
-//                locationService.start();
-//            }
-//        }).start();
-//    }
 
     private void initMap() {
         mBaiduMap = mMapView.getMap();
@@ -167,6 +165,15 @@ public class MapFindActivity extends AppCompatActivity {
         cell_edit = (EditText)findViewById(R.id.cellid_str);
         bid_edit = (EditText)findViewById(R.id.Bid_str);
         bid_liner=(LinearLayout)findViewById(R.id.bid_liner);
+        listView = (ListView) findViewById(R.id.cell_list);
+        lacDataAdapter=new LacDataAdapter(context,luceCellInfos,R.layout.cell_listview_item);
+        listView.setAdapter(lacDataAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
 
         hex_mode = (CheckBox)findViewById(R.id.Hex);
         hex_mode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
@@ -205,8 +212,6 @@ public class MapFindActivity extends AppCompatActivity {
                         }
                     }).start();
                 }
-                //左侧弹出多个基站的查询数据
-//                show_dialog();
             }
         });
 
@@ -230,10 +235,10 @@ public class MapFindActivity extends AppCompatActivity {
                     mBaiduMap.clear();
                     showList.clear();
                     luceCellInfos.clear();
+                    lacDataAdapter.notifyDataSetChanged();
                 }
             }
         });
-
 
         //当前位置
         pos_Btn = (Button) findViewById(R.id.pos_btn);
@@ -242,7 +247,11 @@ public class MapFindActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                baiduMapUtil.addMarker(point.getLat(),point.getLon(),0,point.getAddress(),255f,0f,0f,1f);
+                try {
+                    baiduMapUtil.addMarker(point.getLat(),point.getLon(),point.getAddress(),255f,0f,0f,1f);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -307,20 +316,20 @@ public class MapFindActivity extends AppCompatActivity {
             luceCellInfo.setLac_sid(Integer.valueOf(lac));
             luceCellInfo.setCi_nid(Integer.valueOf(cellid));
         }
-        luceCellInfos.add(luceCellInfo);
-        Local_Qur();
+        Local_Qur(luceCellInfo);
     }
-    private void Local_Qur()
+    private void Local_Qur(LuceCellInfo luceCellInfo)
     {
-        new FindPos(0).execute();
+        //查询后台服务器
+        new FindPos(luceCellInfo).execute();
     }
     /**
      * 查询基站位置
      */
     private class FindPos extends AsyncTask<Object, Void, Object> {
-        private int i=0;
-        private FindPos(int i){
-            this.i=i;
+        private LuceCellInfo cellInfo;
+        private FindPos(LuceCellInfo luceCellInfo){
+            this.cellInfo= luceCellInfo;
         }
 
         @Override
@@ -349,6 +358,7 @@ public class MapFindActivity extends AppCompatActivity {
         protected void onPostExecute(Object object) {
             JSONObject object1=(JSONObject) object;
             if (conn.getResult(object1)==0){
+                luceCellInfos.add(cellInfo);
                 try {
                     JSONArray array=object1.getJSONArray("datalist");
                     List<Point> list=new ArrayList<>();
@@ -382,14 +392,10 @@ public class MapFindActivity extends AppCompatActivity {
                         if (jsonObject.has("acc")){
                             if (!((int)lat1==0&&(int)lon1==0)){
                                 end_latLng=new LatLng(latlon[0],latlon[1]);
-                                baiduMapUtil.addMarker(latlon[0],latlon[1],3,"第三方数据",0f,0f,255f,1.0f);
+                                baiduMapUtil.addMarker(latlon[0],latlon[1],"第三方数据",0f,0f,255f,1.0f);
                             }
                         }
                         else if (jsonObject.has("rssi")){
-                            //按强度渐变添加覆盖物
-//                            if (!((int)lat1==0&&(int)lon1==0)){
-//                                baiduMapUtil.addMarker(latlon[0],latlon[1],4,Math.abs(Double.valueOf(point.getRssi()))+"",255f,0f,0f,1.0f);
-//                            }
                             list_rssi.add(point.getRssi());
                             list.add(point);
                         }
@@ -399,7 +405,6 @@ public class MapFindActivity extends AppCompatActivity {
                     int min_rssi=Integer.valueOf(list_rssi.get(0));
                     for (int i=0;i<list_rssi.size()-1;i++){
                         int current=Integer.valueOf(list_rssi.get(i));
-                        int next=Integer.valueOf(list_rssi.get(i+1));
                         if (current>max_rssi){
                             max_rssi=current;
                         } else if (current<min_rssi){
@@ -411,22 +416,10 @@ public class MapFindActivity extends AppCompatActivity {
                     // var rssi = (json[i].data[0].power - minrssi)*100/(maxrssi-minrssi);
                     Log.e("rssi",max_rssi+"   "+min_rssi+"");
                     for (int i=0;i<list.size();i++){
-                        int rssi= (int) Math.abs(Double.valueOf(list.get(i).getRssi()));
                         int rssi_rgb=(Integer.valueOf(list.get(i).getRssi())-min_rssi)*100/(max_rssi-min_rssi);
                         final double[] latlon1= GPSUtils.wgs2bd(Double.valueOf(list.get(i).getLat()),Double.valueOf(list.get(i).getLon()));
                         if (!((int)latlon1[0]==0&&(int)latlon1[1]==0)){
-                            baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",(100-rssi_rgb)*255/100 ,rssi_rgb*255/100,0f,1.0f);
-//                            if (rssi==max_rssi){
-//                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",0f,255f,0f,1.0f);
-//                            }else if (rssi==min_rssi){
-//                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,0f,0f,1.0f);
-//                            }else if (max_rssi-rssi<5){
-//                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",20f,255f,100f,1.0f);
-//                            }else if (rssi-min_rssi<5){
-//                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",255f,95f,25f,1.0f);
-//                            }else {
-//                                baiduMapUtil.addMarker(latlon1[0],latlon1[1],4,Math.abs(Double.valueOf(list.get(i).getRssi()))+"",241f,255f,183f,1.0f);
-//                            }
+                            baiduMapUtil.addMarker(latlon1[0],latlon1[1],Double.valueOf(list.get(i).getRssi())+"",(100-rssi_rgb)*255/100 ,rssi_rgb*255/100,0f,1.0f);
                         }
                     }
                     for (int i=0;i<list.size();i++){
@@ -451,18 +444,17 @@ public class MapFindActivity extends AppCompatActivity {
                         if (showList.size()==0){
                             baiduMapUtil.draw_find(latLngs);
                         }else if (showList.size()==1||showList.size()>1){
-                            //红：0xffff0000 绿：0xff00ff00 蓝：0xff0000ff 黄色：0xffffff00 青色：0xff00ffff 品红：0xffff00ff
                             OverlayOptions polygonOption=null;
                             if (showList.size()<7){
                                 polygonOption = new PolygonOptions()
                                         .points(latLngs)
-                                        .stroke(new Stroke(5, 0xff00ffff))
-                                        .fillColor(color[showList.size()-1]);//只改变覆盖区域的颜色
+                                        .stroke(new Stroke(5, color[showList.size()-1]))//color[showList.size()-1]
+                                        .fillColor(0x80ffffff);
                             }else {
                                 polygonOption = new PolygonOptions()
                                         .points(latLngs)
-                                        .stroke(new Stroke(5, 0xff00ffff))
-                                        .fillColor(color[showList.size()-7]);
+                                        .stroke(new Stroke(5, color[showList.size()-7]))//color[showList.size()-7]
+                                        .fillColor(0x80ffffff);
                             }
                             showList.add(polygonOption);
                             baiduMapUtil.add_more_overlay(showList);
@@ -472,12 +464,22 @@ public class MapFindActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }else {
-                AlertDialog.Builder builder=new AlertDialog.Builder(context);
-                builder.setTitle("温馨提示");
-                builder.setMessage("查询不到该基站的位置信息");
-                builder.setPositiveButton("确定", null);
-                builder.show();
+                //查询手机数据库数据
+                List<String> list=new ArrayList<>();
+                list=impl.FindPos(mnc,lac,cellid);
+                if(!list.isEmpty()) {
+                    luceCellInfos.add(cellInfo);
+                    baiduMapUtil.addMarker(Double.valueOf(list.get(0)), Double.valueOf(list.get(1)),
+                            "手机数据库数据", 251f, 93f, 255f, 1f);
+                }else {
+                    AlertDialog.Builder builder=new AlertDialog.Builder(context);
+                    builder.setTitle("温馨提示");
+                    builder.setMessage("查询不到该基站的位置信息");
+                    builder.setPositiveButton("确定", null);
+                    builder.show();
+                }
             }
+            lacDataAdapter.notifyDataSetChanged();
         }
     }
     private boolean GetRequestParam() {
@@ -700,8 +702,6 @@ public class MapFindActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mMapView.onDestroy();
-//        if(locationService!=null)
-//            locationService.registerListener(mListener);
     }
     @Override
     protected void onResume() {
@@ -713,110 +713,4 @@ public class MapFindActivity extends AppCompatActivity {
         super.onPause();
         mMapView.onPause();
     }
-//    private BDLocationListener mListener = new BDLocationListener() {
-//
-//        @Override
-//        public void onReceiveLocation(BDLocation location) {
-//            // TODO Auto-generated method stub
-//            if (null != location && location.getLocType() != BDLocation.TypeServerError) {
-//                if (location == null)
-//                    return;
-//                // 设置定位 位置信息
-//                ((MyApplication) context.getApplicationContext()).locData = new MyLocationData.Builder()
-//                        .accuracy(location.getRadius()).direction(100)// 精度范围
-//                        .latitude(location.getLatitude())// 经度
-//                        .longitude(location.getLongitude()).build();// 纬度
-//                Log.e("MainActivity",MyApplication.getInstance().getLocData().latitude+","+MyApplication.getInstance().getLocData().longitude);
-//                mBaiduMap.setMyLocationData(MyApplication.getInstance().getLocData());
-////                LatLng ll = new LatLng(location.getLatitude(),
-////                        location.getLongitude());
-////                MapStatus.Builder builder = new MapStatus.Builder();
-////                builder.target(ll).zoom(18.0f);
-////                mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
-//
-//                StringBuffer sb = new StringBuffer(256);
-//                sb.append("time : ");
-//                /**
-//                 * 时间也可以使用systemClock.elapsedRealtime()方法 获取的是自从开机以来，每次回调的时间；
-//                 * location.getTime() 是指服务端出本次结果的时间，如果位置不发生变化，则时间不变
-//                 */
-//                sb.append(location.getTime());
-//                sb.append("\nerror code : ");
-//                sb.append(location.getLocType());
-//                sb.append("\nlatitude : ");
-//                sb.append(location.getLatitude());
-//                sb.append("\nlontitude : ");
-//                sb.append(location.getLongitude());
-//                sb.append("\nradius : ");
-//                sb.append(location.getRadius());
-//                sb.append("\nCountryCode : ");
-//                sb.append(location.getCountryCode());
-//                sb.append("\nCountry : ");
-//                sb.append(location.getCountry());
-//                sb.append("\ncitycode : ");
-//                sb.append(location.getCityCode());
-//                sb.append("\ncity : ");
-//                sb.append(location.getCity());
-//                sb.append("\nDistrict : ");
-//                sb.append(location.getDistrict());
-//                sb.append("\nStreet : ");
-//                sb.append(location.getStreet());
-//                sb.append("\naddr : ");
-//                sb.append(location.getAddrStr());
-//                sb.append("\nDescribe: ");
-//                sb.append(location.getLocationDescribe());
-//                sb.append("\nDirection(not all devices have value): ");
-//                sb.append(location.getDirection());
-//                sb.append("\nPoi: ");
-//                //*****************************
-//                point=new LocationPoint();
-//                point.setLat(location.getLatitude());
-//                point.setLon(location.getLongitude());
-//                if(location.getAddrStr()!=null){
-//                    point.setAddress(location.getAddrStr()+" "+location.getLocationDescribe());
-//                }else{
-//
-//                }
-//                Log.e("MainActivity",point.getLat()+","+point.getLon()+","+point.getAddress());
-////                NeighborCell.getInstance(context).sendObservableNotice(new NoticeData(MessageType.AUTO_COLLEC_FINISH,""));
-//                //*********************************
-//                if (location.getPoiList() != null && !location.getPoiList().isEmpty()) {
-//                    for (int i = 0; i < location.getPoiList().size(); i++) {
-//                        Poi poi = (Poi) location.getPoiList().get(i);
-//                        sb.append(poi.getName() + ";");
-//                    }
-//                }
-//                if (location.getLocType() == BDLocation.TypeGpsLocation) {// GPS定位结果
-//                    sb.append("\nspeed : ");
-//                    sb.append(location.getSpeed());// 单位：km/h
-//                    sb.append("\nsatellite : ");
-//                    sb.append(location.getSatelliteNumber());
-//                    sb.append("\nheight : ");
-//                    sb.append(location.getAltitude());// 单位：米
-//                    sb.append("\ndescribe : ");
-//                    sb.append("gps定位成功");
-//                } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// 网络定位结果
-//                    // 运营商信息
-//                    sb.append("\noperationers : ");
-//                    sb.append(location.getOperators());
-//                    sb.append("\ndescribe : ");
-//                    sb.append("网络定位成功");
-//                } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
-//                    sb.append("\ndescribe : ");
-//                    sb.append("离线定位成功，离线定位结果也是有效的");
-//                } else if (location.getLocType() == BDLocation.TypeServerError) {
-//                    sb.append("\ndescribe : ");
-//                    sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
-//                } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
-//                    sb.append("\ndescribe : ");
-//                    sb.append("网络不同导致定位失败，请检查网络是否通畅");
-//                } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
-//                    sb.append("\ndescribe : ");
-//                    sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
-//                }
-//                Log.d("Loc",sb.toString());
-//            }
-//        }
-//
-//    };
 }
