@@ -133,6 +133,8 @@ public class MainActivity extends Activity implements Observer {
 
             }
         });
+
+        initMapTopView();
     }
 
     private void GetMyLocation() {
@@ -152,7 +154,9 @@ public class MainActivity extends Activity implements Observer {
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
     }
 
+    private View maplayoutView;
     private void initView() {
+        maplayoutView = findViewById(R.id.main_map_rela);
         mMapView=(MapView) findViewById(R.id.bmapView);
         mapRelaView = findViewById(R.id.main_map_rela);
         logo_view=(ImageView)findViewById(R.id.logo_imageview);
@@ -578,7 +582,8 @@ public class MainActivity extends Activity implements Observer {
     private void updateAllData(CellType type) {
         switch (type) {
             case GPS:
-
+//                String positionMsg =
+//                showCurrentPositionTV.set
                 break;
             case GSM_M:
             case GSM_U:
@@ -675,6 +680,7 @@ public class MainActivity extends Activity implements Observer {
     }
 
 
+    private TextView showCurrentPositionTV;
     private Button startTaskBtn,dataMapSwitchBtn,showFindBtsBtn;
     /**
      * 初始换功能按钮
@@ -702,11 +708,11 @@ public class MainActivity extends Activity implements Observer {
             public void onClick(View v) {
                 if(dataMapSwitchBtn.getText().toString().equals("显示地图")){
                     dataMapSwitchBtn.setText("显示数据");
-                    mMapView.setVisibility(View.VISIBLE);
+                    maplayoutView.setVisibility(View.VISIBLE);
                 }
                 else {
                     dataMapSwitchBtn.setText("显示地图");
-                    mMapView.setVisibility(View.INVISIBLE);
+                    maplayoutView.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -720,6 +726,7 @@ public class MainActivity extends Activity implements Observer {
                 startActivity(intent);
             }
         });
+        showCurrentPositionTV = (TextView)findViewById(R.id.tv_show_position);
     }
 
     private LinkedList<LatLng>  trackList = new LinkedList<>();
@@ -836,15 +843,22 @@ public class MainActivity extends Activity implements Observer {
                     showBtsType = CellType.LTE.toString();
                     break;
             }
-
-
         }
         @Override
         public void onNothingSelected(AdapterView<?> adapterView) {
-
         }
     };
 
-
+    public void getAllBts(String btsType){
+//        DbAcessImpl db=DbAcessImpl.getDbInstance(context);
+//
+//        LinkedList<LatLng> list = new LinkedList<>();
+//
+//        list.addAll(db.selectByFileGetPoint(taskName));
+//
+//        for(LatLng latLng:list){
+//            addPointToMap(latLng);
+//        }
+    }
 
 }

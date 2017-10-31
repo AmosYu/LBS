@@ -363,6 +363,32 @@ public class DbAcessImpl implements DbAccess {
         return list;
     }
 
+    public List<Map<String,Object>> selectByFile(String filename,String btsType){
+        List<Map<String,Object>> list=new ArrayList<>();
+//        SQLiteDatabase db = dHelper.getReadableDatabase();
+        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where userRemark=? and btsType=?",
+                new String[]{filename,btsType});
+        Log.e("mytag",cursor.getCount()+"");
+        while(cursor.moveToNext()){
+            Map<String,Object> map=new HashMap<>();
+            map.put("lac_sid",cursor.getInt(0));
+            map.put("ci_nid",cursor.getInt(1));
+            map.put("bid",cursor.getInt(2));
+            map.put("type",cursor.getString(3));
+            map.put("latitude",cursor.getDouble(4));
+            map.put("longitude",cursor.getDouble(5));
+            map.put("address",cursor.getString(6));
+            map.put("arfcn",cursor.getInt(7));
+            map.put("rssi",cursor.getInt(8));
+            map.put("time",cursor.getString(9));
+            map.put("zhishi",cursor.getString(10));
+            list.add(map);
+        }
+//        db.close();
+        return list;
+    }
+
+
     /**
      * 根据文件名查询所有数据
      * @param filename
