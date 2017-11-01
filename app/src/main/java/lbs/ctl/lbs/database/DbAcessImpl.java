@@ -396,11 +396,11 @@ public class DbAcessImpl implements DbAccess {
      */
     public LinkedList<LatLng> selectByFileGetPoint(String filename){
         LinkedList<LatLng> list=new LinkedList<>();
-        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where userRemark=?",
+        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType,baiduLatitude,baiduLongitude from userData where userRemark=?",
                 new String[]{filename});
         Log.e("mytag",cursor.getCount()+"");
         while(cursor.moveToNext()){
-            LatLng latLng = Gps2BaiDu.gpsToBaidu(cursor.getDouble(4),cursor.getDouble(5));
+            LatLng latLng = new LatLng(cursor.getDouble(11),cursor.getDouble(12));//Gps2BaiDu.gpsToBaidu(cursor.getDouble(4),cursor.getDouble(5));
             list.add(latLng);
         }
         return list;
@@ -413,25 +413,35 @@ public class DbAcessImpl implements DbAccess {
      * @param type
      * @return
      */
-    public List<Map<String,Object>> selectByNameAndType(String filename, String type){
-        List<Map<String,Object>> list=new ArrayList<>();
+    public List<LuceCellInfo> selectByNameAndType(String filename, String type){
+        List<LuceCellInfo> list=new ArrayList<>();
 //        SQLiteDatabase db = dHelper.getReadableDatabase();
         Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where userRemark=? AND btsType=?",
                 new String[]{filename,type});
         while (cursor.moveToNext()){
-            Map<String,Object> map=new HashMap<>();
-            map.put("lac_sid",cursor.getInt(0));
-            map.put("ci_nid",cursor.getInt(1));
-            map.put("bid",cursor.getInt(2));
-            map.put("type",cursor.getString(3));
-            map.put("latitude",cursor.getDouble(4));
-            map.put("longitude",cursor.getDouble(5));
-            map.put("address",cursor.getString(6));
-            map.put("arfcn",cursor.getInt(7));
-            map.put("rssi",cursor.getInt(8));
-            map.put("time",cursor.getInt(9));
-            map.put("zhishi",cursor.getString(10));
-            list.add(map);
+            LuceCellInfo luceCellInfo = new LuceCellInfo();
+            luceCellInfo.setLac_sid(cursor.getInt(0));
+            luceCellInfo.setCi_nid(cursor.getInt(1));
+            luceCellInfo.setBid(cursor.getInt(2));
+            luceCellInfo.setCellType(cursor.getString(3));
+            luceCellInfo.setLatitude(cursor.getDouble(4));
+            luceCellInfo.setLongitude(cursor.getDouble(5));
+            luceCellInfo.setAddress(cursor.getString(6));
+            luceCellInfo.setArfcn(cursor.getInt(7));
+            luceCellInfo.setRssi(cursor.getInt(8));
+            luceCellInfo.setBtsType(cursor.getString(10));
+//            map.put("lac_sid",cursor.getInt(0));
+//            map.put("ci_nid",cursor.getInt(1));
+//            map.put("bid",cursor.getInt(2));
+//            map.put("type",cursor.getString(3));
+//            map.put("latitude",cursor.getDouble(4));
+//            map.put("longitude",cursor.getDouble(5));
+//            map.put("address",cursor.getString(6));
+//            map.put("arfcn",cursor.getInt(7));
+//            map.put("rssi",cursor.getInt(8));
+//            map.put("time",cursor.getInt(9));
+//            map.put("zhishi",cursor.getString(10));
+            list.add(luceCellInfo);
         }
 //        db.close();
         return list;

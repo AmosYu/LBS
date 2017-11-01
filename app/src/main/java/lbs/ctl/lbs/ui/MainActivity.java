@@ -38,6 +38,7 @@ import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
@@ -46,6 +47,7 @@ import com.baidu.mapapi.utils.DistanceUtil;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -730,7 +732,7 @@ public class MainActivity extends Activity implements Observer {
     }
 
     private LinkedList<LatLng>  trackList = new LinkedList<>();
-    private LinkedList<LuceCellInfo>  btsList = new LinkedList<>();
+    private LinkedList<Map<String,Object>>  btsList = new LinkedList<>();
 
 
     private boolean addPointToTrackList(LatLng point){
@@ -755,7 +757,7 @@ public class MainActivity extends Activity implements Observer {
      */
     private boolean isEnableAdd(LatLng latLng){
         for(LatLng latLngInList:trackList){
-            if(DistanceUtil.getDistance(latLng,latLngInList)<20){
+            if(DistanceUtil.getDistance(latLng,latLngInList)<10){
                 return false;
             }
         }
@@ -764,6 +766,7 @@ public class MainActivity extends Activity implements Observer {
 
     //将可显示的点添加至地图上
     private void addMarkOnMap(LatLng latLng){
+
         BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(R.drawable.iconmarka);
         //构建MarkerOption，用于在地图上添加Marker
         OverlayOptions option = new MarkerOptions().position(latLng).icon(bitmap);
@@ -850,15 +853,27 @@ public class MainActivity extends Activity implements Observer {
     };
 
     public void getAllBts(String btsType){
-//        DbAcessImpl db=DbAcessImpl.getDbInstance(context);
-//
-//        LinkedList<LatLng> list = new LinkedList<>();
-//
-//        list.addAll(db.selectByFileGetPoint(taskName));
-//
-//        for(LatLng latLng:list){
-//            addPointToMap(latLng);
-//        }
+        DbAcessImpl db=DbAcessImpl.getDbInstance(context);
+        btsList.clear();
+        btsList.addAll(db.selectByFile(AllCellInfo.userMark,btsType));
+
+
     }
+
+    public void initTypeBts(LinkedList<LuceCellInfo> btsInfoList){
+        LinkedList<ArrayList<LuceCellInfo>> firstList = new LinkedList<>();
+        for(LuceCellInfo luceCellInfo:btsInfoList){
+            for(ArrayList<LuceCellInfo> secondList:firstList){
+                if(secondList.get(0).getLac_sid()==luceCellInfo.getLac_sid()){
+                    secondList.add(luceCellInfo);
+                    return;
+                }
+            }
+            ArrayList<LuceCellInfo> newList = new ArrayList<>();
+            newList.add(luceCellInfo);
+            firstList.add(newList);
+        }
+    }
+
 
 }

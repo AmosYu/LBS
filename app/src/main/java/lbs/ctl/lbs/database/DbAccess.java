@@ -64,7 +64,7 @@ public interface  DbAccess {
      * @return
      */
     List<Map<String,Object>> selectByFile(String filename);
-    public List<Map<String,Object>> selectByNameAndType(String filename, String type);
+    public List<LuceCellInfo> selectByNameAndType(String filename, String type);
     //根据LAC值和CELL值 查询出对应的基站经纬度
     ArrayList<String> FindPos(String mnc,String lac, String cellid);
 
@@ -91,6 +91,8 @@ public interface  DbAccess {
     public final String USER_DATA="userData";
     public final String USER_MARK="userMark";
     public final String MARK="mark";
+    public final String BAIDULATITUDE = "baiduLatitude";
+    public final String BAIDULONGITUDE = "baiduLongitude";
 
 
 }
