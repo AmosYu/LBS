@@ -45,7 +45,7 @@ public class DetectiveHelper extends SQLiteOpenHelper {
                 "time text," +
                 "address text," +
                 "btsType text," +
-                "userRemark text"+"baiduLatitude Double"+"baiduLongitude"+")");
+                "userRemark text,"+"baiduLatitude Double,"+"baiduLongitude Double"+")");
         db.execSQL("create table userData(" +"CELL_TYPE text,"+
                 "LAC_SID Integer," +
                 "CI_NID Integer," +
@@ -60,7 +60,7 @@ public class DetectiveHelper extends SQLiteOpenHelper {
                 "time text," +
                 "address text," +
                 "btsType text," +
-                "userRemark text"+"baiduLatitude Double"+"baiduLongitude Double"+")");
+                "userRemark text,"+"baiduLatitude Double,"+"baiduLongitude Double"+")");
     }
 
 

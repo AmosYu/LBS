@@ -236,20 +236,20 @@ public class DbAcessImpl implements DbAccess {
 //        SQLiteDatabase db = dHelper.getWritableDatabase();
         if(isCdma) {
             dbWrite.update(USER_DATA, getContentValues(luceCellInfo),
-                    LAC_SID + "=? and " + CI_NID + "=? and " + BID + "=? and "+RSSI + "<?  and "+USER_REMARK+"=?",
+                    LAC_SID + "=? and " + CI_NID + "=? and " + BID + "=? and "+RSSI + "<?  and "+USER_REMARK+"=? and "+LATITUDE+"=? and "+LONGITUDE+"=? ",
                     new String[]{String.valueOf(luceCellInfo.getLac_sid()),
                             String.valueOf(luceCellInfo.getCi_nid()),
                             String.valueOf(luceCellInfo.getBid()),
                             String.valueOf(luceCellInfo.getRssi()),
-                            luceCellInfo.getUserRemark()});
+                            luceCellInfo.getUserRemark(),String.valueOf(luceCellInfo.getLatitude()),String.valueOf(luceCellInfo.getLongitude())});
         }
         else{
             dbWrite.update(USER_DATA, getContentValues(luceCellInfo),
-                    LAC_SID + "=? and " + CI_NID + "=? and "+RSSI + "<? and "+USER_REMARK+"=?" ,
+                    LAC_SID + "=? and " + CI_NID + "=? and "+RSSI + "<? and "+USER_REMARK+"=? and "+LATITUDE+"=? and "+LONGITUDE+"=? " ,
                     new String[]{String.valueOf(luceCellInfo.getLac_sid()),
                             String.valueOf(luceCellInfo.getCi_nid()),
                             String.valueOf(luceCellInfo.getRssi()),
-                            luceCellInfo.getUserRemark()});
+                            luceCellInfo.getUserRemark(),String.valueOf(luceCellInfo.getLatitude()),String.valueOf(luceCellInfo.getLongitude())});
         }
 //        db.close();
 
@@ -413,8 +413,8 @@ public class DbAcessImpl implements DbAccess {
      * @param type
      * @return
      */
-    public List<LuceCellInfo> selectByNameAndType(String filename, String type){
-        List<LuceCellInfo> list=new ArrayList<>();
+    public LinkedList<LuceCellInfo> selectByNameAndType(String filename, String type){
+        LinkedList<LuceCellInfo> list=new LinkedList<>();
 //        SQLiteDatabase db = dHelper.getReadableDatabase();
         Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where userRemark=? AND btsType=?",
                 new String[]{filename,type});
@@ -475,7 +475,7 @@ public class DbAcessImpl implements DbAccess {
     public List<LuceCellInfo> findBtsUseId(String lac_sid, String ci_nid, CellType type){
         List<LuceCellInfo> list=new ArrayList<>();
         String cellType = type.toString();
-        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where LAC_SID=? AND CI_NID=? AND CELL_TYPE=?",
+        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where LAC_SID=? AND CI_NID=? AND btsType=?",
                 new String[]{lac_sid,ci_nid,cellType});
         while (cursor.moveToNext()){
             LuceCellInfo lci = new LuceCellInfo();
@@ -504,7 +504,7 @@ public class DbAcessImpl implements DbAccess {
     public List<LuceCellInfo> findOnlySameLacBts(String lac_sid,String ci_nid,CellType type){
         List<LuceCellInfo> list=new ArrayList<>();
         String cellType = type.toString();
-        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where LAC_SID=? AND CI_NID!=? AND CELL_TYPE=?",
+        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where LAC_SID=? AND CI_NID!=? AND btsType=?",
                 new String[]{lac_sid,ci_nid,cellType});
         while (cursor.moveToNext()){
             LuceCellInfo lci = new LuceCellInfo();
@@ -602,6 +602,8 @@ public class DbAcessImpl implements DbAccess {
         insertData.put(ADDRESS,luceCellInfo.getAddress());
         insertData.put(USER_REMARK,luceCellInfo.getUserRemark());
         insertData.put(BTS_TYPE,luceCellInfo.getBtsType());
+        insertData.put(BAIDULATITUDE,luceCellInfo.getBaiduPoint().latitude);
+        insertData.put(BAIDULONGITUDE,luceCellInfo.getBaiduPoint().longitude);
         return insertData;
     }
 
@@ -621,7 +623,7 @@ public class DbAcessImpl implements DbAccess {
     public void saveInDb(ArrayList<LuceCellInfo> cellInfos, boolean isCdma ){
         for(LuceCellInfo luceCellInfo:cellInfos){
             if(luceCellInfo.getLac_sid()==0||luceCellInfo.getCi_nid()==0) return;
-            if(!cellInDbUserdata(luceCellInfo,isCdma)){
+            if(!cellInDbUserdataS(luceCellInfo,isCdma)){
                 insertCellMapInfo(luceCellInfo, DbAccess.USER_COLLECTION);
             }
             else{
@@ -637,6 +639,8 @@ public class DbAcessImpl implements DbAccess {
                 continue;
             if((luceCellInfo.getLac_sid()!=0&&luceCellInfo.getLac_sid()!=65535)&&(luceCellInfo.getCi_nid()!=0))
                 insertCellMapInfo(luceCellInfo, DbAccess.USER_COLLECTION);
+            else
+                updateUserdata(luceCellInfo,isCdma);
 
         }
     }

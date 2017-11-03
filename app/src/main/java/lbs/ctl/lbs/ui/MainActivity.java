@@ -2,7 +2,6 @@ package lbs.ctl.lbs.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,6 +9,8 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -20,7 +21,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -64,6 +64,7 @@ import lbs.ctl.lbs.utils.Gps2BaiDu;
 import lbs.ctl.lbs.utils.LocationPoint;
 import lbs.ctl.lbs.BaiduMap.LocationService;
 
+import static lbs.ctl.lbs.luce.CellType.CDMA;
 import static lbs.ctl.lbs.luce.CellType.GSM_M;
 import static lbs.ctl.lbs.luce.CellType.GSM_U;
 import static lbs.ctl.lbs.luce.CellType.LTE;
@@ -154,6 +155,12 @@ public class MainActivity extends Activity implements Observer {
         mBaiduMap = mMapView.getMap();
         //普通地图
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+        mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                return false;
+            }
+        });
     }
 
     private View maplayoutView;
@@ -780,6 +787,22 @@ public class MainActivity extends Activity implements Observer {
         mBaiduMap.addOverlay(option);
     }
 
+//    private void addMarkOnMap(LuceCellInfo luceCellInfo,BitmapDescriptor bitmap){
+//        LatLng latLng = luceCellInfo.getBaiduPoint();
+//        String title = luceCellInfo.getLac_sid()+","+luceCellInfo.getCi_nid()+","+luceCellInfo.getBid();
+////        BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(R.drawable.iconmarka);
+//        //构建MarkerOption，用于在地图上添加Marker
+//        OverlayOptions option = new MarkerOptions().position(latLng).icon(bitmap).title(title);
+//        //定义地图状态
+//        MapStatus mMapStatus = new MapStatus.Builder().target(latLng).zoom(18).build();
+//        //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
+//        MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+//        //改变地图状态
+//        mBaiduMap.setMapStatus(mMapStatusUpdate);
+//        //在地图上添加Marker，并显示
+//        mBaiduMap.addOverlay(option);
+//    }
+
     private void initTrackList(String taskName){
 
         DbAcessImpl db=DbAcessImpl.getDbInstance(context);
@@ -800,8 +823,12 @@ public class MainActivity extends Activity implements Observer {
      */
     private void addPointToMap(LatLng latLng){
         boolean add = addPointToTrackList(latLng);
-        if(add)
-            addMarkOnMap(latLng);
+        if(add) {
+            Message msg = new Message();
+            msg.arg1 = 1010;
+            msg.obj = latLng;
+            handler.sendMessage(msg);
+        }
     }
 
 
@@ -846,34 +873,173 @@ public class MainActivity extends Activity implements Observer {
                     showBtsType = CellType.LTE.toString();
                     break;
             }
+            if(showBtsType.equals("全部")){
+                initTack();
+            }else {
+                initBts(showBtsType);
+            }
         }
         @Override
         public void onNothingSelected(AdapterView<?> adapterView) {
         }
     };
 
-    public void getAllBts(String btsType){
-        DbAcessImpl db=DbAcessImpl.getDbInstance(context);
-        btsList.clear();
-        btsList.addAll(db.selectByFile(AllCellInfo.userMark,btsType));
+    /**
+     * 任务下的所有制定制式的数据，内层集合中每个List中是同LAC的基站
+     */
+    private LinkedList<ArrayList<LuceCellInfo>> btsInfoList = new LinkedList<>();
 
-
-    }
-
-    public void initTypeBts(LinkedList<LuceCellInfo> btsInfoList){
-        LinkedList<ArrayList<LuceCellInfo>> firstList = new LinkedList<>();
-        for(LuceCellInfo luceCellInfo:btsInfoList){
-            for(ArrayList<LuceCellInfo> secondList:firstList){
-                if(secondList.get(0).getLac_sid()==luceCellInfo.getLac_sid()){
-                    secondList.add(luceCellInfo);
+    /**
+     * 将基站数据添加至区分LAC的btsInfoList中
+     * @param luceCellInfo
+     */
+    private void addBsInfoToList(LuceCellInfo luceCellInfo){
+        for(ArrayList<LuceCellInfo> sameLacList:btsInfoList){
+            if(luceCellInfo.getBtsType().equals(CDMA.toString())){
+                if(sameLacList.get(0).getBid()==luceCellInfo.getBid()){
+                    sameLacList.add(luceCellInfo);
                     return;
                 }
             }
-            ArrayList<LuceCellInfo> newList = new ArrayList<>();
-            newList.add(luceCellInfo);
-            firstList.add(newList);
+            else{
+                if(sameLacList.get(0).getLac_sid()==luceCellInfo.getLac_sid()){
+                    sameLacList.add(luceCellInfo);
+                    return;
+                }
+            }
+        }
+        ArrayList<LuceCellInfo> newList = new ArrayList<>();
+        newList.add(luceCellInfo);
+        btsInfoList.add(newList);
+    }
+
+    private void  addBtsInfoToMap(){
+
+        int i = 0;
+        for(ArrayList<LuceCellInfo> luceCellInfos:btsInfoList){
+            for(LuceCellInfo luceCellInfo : luceCellInfos){
+                if(!addPointToTrackList(luceCellInfo.getBaiduPoint())){
+                    continue;
+                }
+                Message msg = new Message();
+                msg.obj  = luceCellInfo;
+                msg.arg1 = 101010;
+                msg.arg2 = i;
+                handler.sendMessage(msg);
+            }
+            i++;
         }
     }
 
 
+    private void initTack(){
+        progressDialog.setMessage("正在加载数据请稍等...");
+        progressDialog.show();
+        new Thread(){
+            @Override
+            public void run() {
+                btsInfoList.clear();
+                trackList.clear();
+                mBaiduMap.clear();
+                initTrackList(AllCellInfo.userMark);
+            }
+        }.start();
+    }
+    private void initBts(final String btsType ){
+        progressDialog.setMessage("正在加载数据请稍等...");
+        progressDialog.show();
+        new Thread(){
+            public void run() {
+                DbAcessImpl db=DbAcessImpl.getDbInstance(context);
+                LinkedList<LuceCellInfo> luceCellInfos = new LinkedList<LuceCellInfo>();
+
+                luceCellInfos.addAll(db.selectByNameAndType(AllCellInfo.userMark,btsType));
+                btsInfoList.clear();
+                trackList.clear();
+                mBaiduMap.clear();
+                for(LuceCellInfo luceCellInfo:luceCellInfos){
+                    addBsInfoToList(luceCellInfo);
+                }
+                addBtsInfoToMap();
+            }
+        }.start();
+    }
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if(msg.arg1 == 101010){
+                progressDialog.dismiss();
+                LuceCellInfo luceCellInfo =(LuceCellInfo) msg.obj;
+
+                LatLng latLng = luceCellInfo.getBaiduPoint();
+                String title = luceCellInfo.getLac_sid()+","+luceCellInfo.getCi_nid()+","+luceCellInfo.getBid();
+                BitmapDescriptor bitmap = getBitmap(msg.arg2);
+                //构建MarkerOption，用于在地图上添加Marker
+                OverlayOptions option = new MarkerOptions().position(latLng).icon(bitmap).title(title);
+                //定义地图状态
+                MapStatus mMapStatus = new MapStatus.Builder().target(latLng).zoom(18).build();
+                //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
+                MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+                //改变地图状态
+                mBaiduMap.setMapStatus(mMapStatusUpdate);
+                //在地图上添加Marker，并显示
+                mBaiduMap.addOverlay(option);
+            }
+            else if(msg.arg1==1010){
+                progressDialog.dismiss();
+                LatLng latLng = (LatLng)msg.obj;
+                BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(R.drawable.iconmarka);
+                //构建MarkerOption，用于在地图上添加Marker
+                OverlayOptions option = new MarkerOptions().position(latLng).icon(bitmap);
+                //定义地图状态
+                MapStatus mMapStatus = new MapStatus.Builder().target(latLng).zoom(18).build();
+                //定义MapStatusUpdate对象，以便描述地图状态将要发生的变化
+                MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+                //改变地图状态
+                mBaiduMap.setMapStatus(mMapStatusUpdate);
+                //在地图上添加Marker，并显示
+                mBaiduMap.addOverlay(option);
+            }
+        }
+    };
+
+
+    private BitmapDescriptor getBitmap(int id){
+        BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p1);
+        switch (id%10){
+            case 0:
+                bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p1);
+                break;
+            case 1:
+                bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p2);
+                break;
+            case 2:
+                bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p3);
+                break;
+            case 3:
+                bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p4);
+                break;
+            case 4:
+                bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p5);
+                break;
+            case 5:
+                bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p6);
+                break;
+            case 6:
+                bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p7);
+                break;
+            case 7:
+                bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p8);
+                break;
+            case 8:
+                bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p9);
+                break;
+            case 9:
+                bitmap = BitmapDescriptorFactory.fromResource(R.drawable.p10);
+                break;
+        }
+        return bitmap;
+    }
 }

@@ -75,12 +75,14 @@ public class RevThread implements Runnable {
             case 2://移动G
                 ParseGsm parseGm = new ParseGsm(dataMsg,CellType.GSM_M,latitude,longitude,allCellInfo.getUserMark(),AllCellInfo.getCurrentTime());
                 allCellInfo.setGsm_mList(parseGm.getLuceCellInfos());
-                dbAcess.saveInDbA(parseGm.getLuceCellInfos(),false);
+                if(allCellInfo.isDataSaveToDb())
+                    dbAcess.saveInDbA(parseGm.getLuceCellInfos(),false);
                 break;
             case 3://联通G
                 ParseGsm parseGu = new ParseGsm(dataMsg,CellType.GSM_U,latitude,longitude,allCellInfo.getUserMark(),AllCellInfo.getCurrentTime());
                 allCellInfo.setGsm_uList(parseGu.getLuceCellInfos());
-                dbAcess.saveInDbA(parseGu.getLuceCellInfos(),false);
+                if(allCellInfo.isDataSaveToDb())
+                    dbAcess.saveInDbA(parseGu.getLuceCellInfos(),false);
                 break;
             case 4://WIFI
                 ParseWifi parseWifi = new ParseWifi(dataMsg);
@@ -90,19 +92,22 @@ public class RevThread implements Runnable {
                 ParseWcdma parseWcdma = new ParseWcdma(dataMsg,latitude,longitude,allCellInfo.getUserMark(),AllCellInfo.getCurrentTime());
                 if(parseWcdma.getLuceCellInfos().size()>0)
                     allCellInfo.setWcdmaInfo(parseWcdma.getLuceCellInfos().get(0));
-                dbAcess.saveInDbA(parseWcdma.getLuceCellInfos(),false);
+                if(allCellInfo.isDataSaveToDb())
+                    dbAcess.saveInDbA(parseWcdma.getLuceCellInfos(),false);
                 break;
             case 6://CDMA
                 ParseCdma parseCdma = new ParseCdma(dataMsg,latitude,longitude,allCellInfo.getUserMark(),AllCellInfo.getCurrentTime());
                 if(parseCdma.getLuceCellInfos().size()>0)
                     allCellInfo.setCdmaInfo(parseCdma.getLuceCellInfos().get(0));
-                dbAcess.saveInDbA(parseCdma.getLuceCellInfos(),true);
+                if(allCellInfo.isDataSaveToDb())
+                    dbAcess.saveInDbA(parseCdma.getLuceCellInfos(),true);
                 break;
             case 7://TDSCDMA
                 ParseTd parseTd = new ParseTd(dataMsg,latitude,longitude,allCellInfo.getUserMark(),AllCellInfo.getCurrentTime());
                 if(parseTd.getLuceCellInfos().size()>0)
                     allCellInfo.setTdInfo(parseTd.getLuceCellInfos().get(0));
-                dbAcess.saveInDbA(parseTd.getLuceCellInfos(),false);
+                if(allCellInfo.isDataSaveToDb())
+                    dbAcess.saveInDbA(parseTd.getLuceCellInfos(),false);
                 break;
             case 8://GPS
                 ParseGps parseGps = new ParseGps(dataMsg);
@@ -127,7 +132,8 @@ public class RevThread implements Runnable {
             case 9://TDLTE
                 ParseTddLte parseTdLte = new ParseTddLte(dataMsg,latitude,longitude,allCellInfo.getUserMark(),AllCellInfo.getCurrentTime());
                 allCellInfo.setTddLteList(parseTdLte.getLuceCellInfos());
-                dbAcess.saveInDbA(parseTdLte.getLuceCellInfos(),false);
+                if(allCellInfo.isDataSaveToDb())
+                    dbAcess.saveInDbA(parseTdLte.getLuceCellInfos(),false);
                 break;
             default:
         }
