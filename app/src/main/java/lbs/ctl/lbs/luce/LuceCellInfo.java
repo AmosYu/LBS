@@ -2,13 +2,15 @@ package lbs.ctl.lbs.luce;
 
 import com.baidu.mapapi.model.LatLng;
 
+import java.io.Serializable;
+
 import lbs.ctl.lbs.utils.Gps2BaiDu;
 
 /**
  * Created by yu on 2016/11/9.
  */
 
-public class LuceCellInfo {
+public class LuceCellInfo implements Serializable{
     /**
      * LAC或SID  cdma代表SID
      */

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/popup"
+    android:paddingTop="15dp"
+    android:paddingBottom="30dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    android:orientation="vertical" >
+    <TextView
+        android:id="@+id/map_window_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="企业名称：样子嘻嘻嘻有限公司" />
+
+    <TextView
+        android:id="@+id/map_window_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="检查部门：安监局" />
+
+</LinearLayout>

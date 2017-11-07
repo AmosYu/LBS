@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -34,6 +35,7 @@ import com.baidu.location.Poi;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
@@ -51,7 +53,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-import lbs.ctl.lbs.R;
+import lbs.ctl.lbs.InfoWindowHolder;
 import lbs.ctl.lbs.bluetooth.BluetoothConn;
 import lbs.ctl.lbs.bluetooth.BluetoothState;
 import lbs.ctl.lbs.database.DbAcessImpl;
@@ -63,6 +65,8 @@ import lbs.ctl.lbs.luce.WifiInfo;
 import lbs.ctl.lbs.utils.Gps2BaiDu;
 import lbs.ctl.lbs.utils.LocationPoint;
 import lbs.ctl.lbs.BaiduMap.LocationService;
+
+import lbs.ctl.lbs.R;
 
 import static lbs.ctl.lbs.luce.CellType.CDMA;
 import static lbs.ctl.lbs.luce.CellType.GSM_M;
@@ -150,15 +154,27 @@ public class MainActivity extends Activity implements Observer {
             }
         }).start();
     }
-
+    private InfoWindow mInfoWindow;
+    private LinearLayout baidumap_infowindow;
+    private MarkerOnInfoWindowClickListener markerListener;
     private void initMap() {
+        baidumap_infowindow = (LinearLayout) LayoutInflater.from (context).inflate (R.layout.baidu_map_infowindow, null);
         mBaiduMap = mMapView.getMap();
+        markerListener = new MarkerOnInfoWindowClickListener ();
         //普通地图
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
         mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                return false;
+
+                if(showBtsType.equals("全部")){
+                    return false;
+                }
+                createInfoWindow(baidumap_infowindow,(LuceCellInfo)  marker.getExtraInfo ().get ("marker"));
+                final LatLng ll = marker.getPosition();
+                mInfoWindow = new InfoWindow (BitmapDescriptorFactory.fromView (baidumap_infowindow), ll, -47, markerListener);
+                mBaiduMap.showInfoWindow(mInfoWindow);
+                return true;
             }
         });
     }
@@ -985,7 +1001,11 @@ public class MainActivity extends Activity implements Observer {
                 //改变地图状态
                 mBaiduMap.setMapStatus(mMapStatusUpdate);
                 //在地图上添加Marker，并显示
-                mBaiduMap.addOverlay(option);
+                Marker marker = (Marker)mBaiduMap.addOverlay(option);
+                // 将信息保存
+                Bundle bundle = new Bundle ();
+                bundle.putSerializable ("marker", luceCellInfo);
+                marker.setExtraInfo (bundle);
             }
             else if(msg.arg1==1010){
                 progressDialog.dismiss();
@@ -1042,4 +1062,43 @@ public class MainActivity extends Activity implements Observer {
         }
         return bitmap;
     }
+
+
+    private void createInfoWindow(LinearLayout baidumap_infowindow,LuceCellInfo luceCellInfo){
+         InfoWindowHolder holder = null;
+//        if(baidumap_infowindow.getTag () == null){
+             holder = new InfoWindowHolder ();
+             holder.tv_title = (TextView) baidumap_infowindow.findViewById (R.id.map_window_title);
+             holder.tv_content = (TextView) baidumap_infowindow.findViewById (R.id.map_window_content);
+
+//        }
+//        holder = (InfoWindowHolder) baidumap_infowindow.getTag ();
+        String title = null;
+        StringBuffer sb = new StringBuffer();
+        sb.append("邻区\n");
+        if(luceCellInfo.getBtsType().equals(CDMA.toString())){
+            title = luceCellInfo.getBtsType()+"大区号：("+luceCellInfo.getLac_sid()+","+luceCellInfo.getCi_nid()+")"+"，小区号："+luceCellInfo.getBid()+"，场强："+luceCellInfo.getRssi();
+        }
+        else{
+            title = luceCellInfo.getBtsType()+"，大区号："+luceCellInfo.getLac_sid()+"，小区号："+luceCellInfo.getCi_nid()+"，场强："+luceCellInfo.getRssi();
+            DbAcessImpl dbAcess = DbAcessImpl.getDbInstance(context);
+            ArrayList<LuceCellInfo> list = new ArrayList<>();
+            list.addAll(dbAcess.findOnlySameLacBts(String.valueOf(luceCellInfo.getLac_sid()),luceCellInfo.getBtsType(),luceCellInfo.getLatitude(),luceCellInfo.getLongitude(),AllCellInfo.userMark));
+            for(LuceCellInfo nCellinfo:list){
+                if(nCellinfo.getCi_nid()!=luceCellInfo.getCi_nid()){
+                    sb.append("小区号："+nCellinfo.getCi_nid()+",场强："+nCellinfo.getRssi()+"\n");
+                }
+            }
+            holder.tv_content.setText (sb.toString());
+        }
+        holder.tv_title.setText (title);
+        }
+    private final class  MarkerOnInfoWindowClickListener implements InfoWindow.OnInfoWindowClickListener
+    {
+        @Override
+        public void onInfoWindowClick(){
+            mBaiduMap.hideInfoWindow();
+        }
+   }
+
 }

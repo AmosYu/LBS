@@ -497,15 +497,14 @@ public class DbAcessImpl implements DbAccess {
     /**
      * 查询本地数据库
      * @param lac_sid
-     * @param ci_nid
      * @param type
      * @return
      */
-    public List<LuceCellInfo> findOnlySameLacBts(String lac_sid,String ci_nid,CellType type){
+    public List<LuceCellInfo> findOnlySameLacBts(String lac_sid,String type,double latitude,double longitude,String mark){
         List<LuceCellInfo> list=new ArrayList<>();
         String cellType = type.toString();
-        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where LAC_SID=? AND CI_NID!=? AND btsType=?",
-                new String[]{lac_sid,ci_nid,cellType});
+        Cursor cursor = dbRead.rawQuery("select LAC_SID,CI_NID,BID,CELL_TYPE,latitude,longitude,address,arfcn,rssi,time,btsType from userData where LAC_SID=? AND btsType=? AND latitude=? AND longitude=? AND userRemark=?",
+                new String[]{lac_sid,type,String.valueOf(latitude),String.valueOf(longitude),mark});
         while (cursor.moveToNext()){
             LuceCellInfo lci = new LuceCellInfo();
             lci.setLac_sid(cursor.getInt(0));
