@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,13 +23,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import lbs.ctl.lbs.R;
 import lbs.ctl.lbs.database.DbAcessImpl;
 import lbs.ctl.lbs.luce.AllCellInfo;
+import lbs.ctl.lbs.utils.ConfigDialog;
 import lbs.ctl.lbs.utils.Utils;
 
 public class LoginActivity extends Activity {
@@ -45,6 +45,7 @@ public class LoginActivity extends Activity {
 
 
     private Button uploadBtn, exportBtn,offlineMapBtn,importBtn,findBtsBtn;
+    private Button config;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,7 @@ public class LoginActivity extends Activity {
 
         context=this;
         MyApplication.getInstance().addActivity(this);
+
         initView();
         initData();
         bindAdapter();
@@ -181,6 +183,14 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View view) {
                 newTask(context);
+            }
+        });
+        config=(Button)findViewById(R.id.main_config_btn);
+        config.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ConfigDialog mdialog=new ConfigDialog();
+                mdialog.showConfig(context);
             }
         });
     }

@@ -62,6 +62,7 @@ import lbs.ctl.lbs.luce.CellType;
 import lbs.ctl.lbs.luce.LuceCellInfo;
 import lbs.ctl.lbs.luce.RevThread;
 import lbs.ctl.lbs.luce.WifiInfo;
+import lbs.ctl.lbs.utils.ConfigDialog;
 import lbs.ctl.lbs.utils.Gps2BaiDu;
 import lbs.ctl.lbs.utils.LocationPoint;
 import lbs.ctl.lbs.BaiduMap.LocationService;
@@ -185,16 +186,15 @@ public class MainActivity extends Activity implements Observer {
         mMapView=(MapView) findViewById(R.id.bmapView);
         mapRelaView = findViewById(R.id.main_map_rela);
         logo_view=(ImageView)findViewById(R.id.logo_imageview);
-        logo_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(MainActivity.this,MapFindActivity.class);
-                intent.putExtra("point",point);
-//                Bundle bundle=new Bundle();
-//                bundle.put
-                startActivity(intent);
-            }
-        });
+
+//        logo_view.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent=new Intent(MainActivity.this,MapFindActivity.class);
+//                intent.putExtra("point",point);
+//                startActivity(intent);
+//            }
+//        });
     }
 
     @Override
@@ -748,6 +748,7 @@ public class MainActivity extends Activity implements Observer {
             public void onClick(View view) {
                 Intent intent = new Intent();
                 intent.setClass(context,MapFindActivity.class);
+                intent.putExtra("point",point);
                 startActivity(intent);
             }
         });

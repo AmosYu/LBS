@@ -157,7 +157,7 @@ public class MapFindActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        mMapView=(MapView) findViewById(R.id.bmapView);
+        mMapView=(MapView) findViewById(R.id.find_bmapView);
         initModeSpinner();
         lac_text=(TextView)findViewById(R.id.lac_text_id);
         cell_text=(TextView)findViewById(R.id.cell_text_id);
@@ -322,7 +322,19 @@ public class MapFindActivity extends AppCompatActivity {
     {
         //查询后台服务器
         new FindPos(luceCellInfo).execute();
+//        findDbImpl();
+
     }
+
+//    private void findDbImpl() {
+//        List<LuceCellInfo> list_luces=new ArrayList<>();
+//        if (mode==dataCode.cdma){
+//            list_luces=impl.findBtsUseId(lac,cellid,bid);
+//        }else {
+//            list_luces=impl.findBtsUseId(lac,cellid,);
+//        }
+//    }
+
     /**
      * 查询基站位置
      */
@@ -698,6 +710,13 @@ public class MapFindActivity extends AppCompatActivity {
         Log.v("bid1", bid);
         return start_flg;
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
