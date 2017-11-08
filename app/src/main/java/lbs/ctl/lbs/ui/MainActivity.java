@@ -891,6 +891,7 @@ public class MainActivity extends Activity implements Observer {
                     break;
             }
             if(showBtsType.equals("全部")){
+
                 initTack();
             }else {
                 initBts(showBtsType);
@@ -951,7 +952,7 @@ public class MainActivity extends Activity implements Observer {
 
     private void initTack(){
         progressDialog.setMessage("正在加载数据请稍等...");
-        progressDialog.show();
+//        progressDialog.show();
         new Thread(){
             @Override
             public void run() {
@@ -964,7 +965,7 @@ public class MainActivity extends Activity implements Observer {
     }
     private void initBts(final String btsType ){
         progressDialog.setMessage("正在加载数据请稍等...");
-        progressDialog.show();
+//        progressDialog.show();
         new Thread(){
             public void run() {
                 DbAcessImpl db=DbAcessImpl.getDbInstance(context);

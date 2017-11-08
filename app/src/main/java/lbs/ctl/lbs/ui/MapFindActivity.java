@@ -155,7 +155,6 @@ public class MapFindActivity extends AppCompatActivity {
             }
         });
     }
-
     private void initView() {
         mMapView=(MapView) findViewById(R.id.find_bmapView);
         initModeSpinner();
@@ -201,17 +200,17 @@ public class MapFindActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                //基站查询
-                boolean start_flg=false;
-                start_flg=GetRequestParam();
-                if(start_flg==true)
-                {
-                    new Thread(new Runnable() {
-                        public void run() {
-                            Request_Gps();
-                        }
-                    }).start();
-                }
+                    //基站查询
+                    boolean start_flg=false;
+                    start_flg=GetRequestParam();
+                    if(start_flg==true)
+                    {
+                        new Thread(new Runnable() {
+                            public void run() {
+                                Request_Gps();
+                            }
+                        }).start();
+                    }
             }
         });
 
