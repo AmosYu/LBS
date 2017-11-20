@@ -128,21 +128,26 @@ public class MainActivity extends Activity implements Observer {
         initMap();
         mapRelaView.setVisibility(View.INVISIBLE);
         GetMyLocation();
-
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("正在初始化当前任务的轨迹，请稍等！");
-
-        startTaskBtn.post(new Runnable() {
+        initMapTopView();
+        new Thread(){
             @Override
             public void run() {
-                progressDialog.show();
                 initTrackList(AllCellInfo.userMark);
-                progressDialog.cancel();
-
             }
-        });
+        }.start();
+//        startTaskBtn.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                progressDialog.show();
+//                initTrackList(AllCellInfo.userMark);
+//                progressDialog.cancel();
+//
+//            }
+//        });
 
-        initMapTopView();
+
     }
 
     private void GetMyLocation() {

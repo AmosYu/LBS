@@ -44,6 +44,13 @@
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@id/main_start_task_btn" />
+        <Button
+            android:id="@+id/main_find_bts_btn"
+            android:layout_width="wrap_content"
+
+            android:text="基站查询"
+            android:layout_toRightOf="@id/main_show_map_btn"
+            android:layout_height="match_parent" />
     </RelativeLayout>
     <LinearLayout
         android:id="@+id/data_show_liner"
@@ -700,7 +707,7 @@
     <RelativeLayout
         android:id="@+id/main_map_rela"
         android:layout_below="@id/main_top_rela"
-        android:layout_marginBottom="50dp"
+
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         >
@@ -722,21 +729,21 @@
         </LinearLayout>
 
     </RelativeLayout>
-    <LinearLayout
-        android:id="@+id/main_buttom"
-        android:layout_alignParentBottom="true"
-        android:layout_width="fill_parent" android:layout_height="50dp"         android:layout_weight="1"
-        android:background="@color/blue3">
-        <TextView
-            android:id="@+id/tv_show_position"
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="match_parent" />
-        <Button
-            android:id="@+id/main_find_bts_btn"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:text="基站查询"
-            android:layout_height="match_parent" />
-    </LinearLayout>
+    <!--<LinearLayout-->
+        <!--android:id="@+id/main_buttom"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_width="fill_parent" android:layout_height="50dp"         android:layout_weight="1"-->
+        <!--android:background="@color/blue3">-->
+        <!--<TextView-->
+            <!--android:id="@+id/tv_show_position"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="3"-->
+            <!--android:layout_height="match_parent" />-->
+        <!--<Button-->
+            <!--android:id="@+id/main_find_bts_btn"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="基站查询"-->
+            <!--android:layout_height="match_parent" />-->
+    <!--</LinearLayout>-->
 </RelativeLayout>
