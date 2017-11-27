@@ -21,6 +21,7 @@ import java.util.Map;
 import lbs.ctl.lbs.luce.AllCellInfo;
 import lbs.ctl.lbs.luce.CellType;
 import lbs.ctl.lbs.luce.LuceCellInfo;
+import lbs.ctl.lbs.utils.GPSUtils;
 import lbs.ctl.lbs.utils.Gps2BaiDu;
 
 import static android.database.sqlite.SQLiteDatabase.openOrCreateDatabase;
@@ -459,8 +460,9 @@ public class DbAcessImpl implements DbAccess {
             while (cursor.moveToNext()){
                 double latitude = cursor.getDouble(0);
                 double longitude = cursor.getDouble(1);
-                list.add(latitude + "");
-                list.add(longitude + "");
+                final double[] latlon= GPSUtils.wgs2bd(latitude,longitude);
+                list.add(latlon[0] + "");
+                list.add(latlon[1] + "");
             }
         }
         return list;
