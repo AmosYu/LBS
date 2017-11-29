@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">路测控制终端</string>
+    <string name="app_name">路测控制端</string>
 
     <string name="message_confirm_to_exit">确定要退出吗?</string>
     <string name="title_dialog_exit_confirm">确认退出</string>

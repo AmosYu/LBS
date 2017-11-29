@@ -12,12 +12,12 @@
         android:id="@+id/map_window_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="企业名称：样子嘻嘻嘻有限公司" />
+         />
 
     <TextView
         android:id="@+id/map_window_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="检查部门：安监局" />
+        />
 
 </LinearLayout>

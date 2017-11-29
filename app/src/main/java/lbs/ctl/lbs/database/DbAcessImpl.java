@@ -360,6 +360,7 @@ public class DbAcessImpl implements DbAccess {
             map.put("zhishi",cursor.getString(10));
             list.add(map);
         }
+        cursor.close();
 //        db.close();
         return list;
     }

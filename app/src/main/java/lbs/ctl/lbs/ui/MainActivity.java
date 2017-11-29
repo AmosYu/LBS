@@ -11,6 +11,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -101,8 +102,8 @@ public class MainActivity extends Activity implements Observer {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
         MyApplication.getInstance().addActivity(this);
@@ -131,12 +132,12 @@ public class MainActivity extends Activity implements Observer {
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("正在初始化当前任务的轨迹，请稍等！");
         initMapTopView();
-        new Thread(){
-            @Override
-            public void run() {
-                initTrackList(AllCellInfo.userMark);
-            }
-        }.start();
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                initTrackList(AllCellInfo.userMark);
+//            }
+//        }.start();
 //        startTaskBtn.post(new Runnable() {
 //            @Override
 //            public void run() {
@@ -147,7 +148,7 @@ public class MainActivity extends Activity implements Observer {
 //            }
 //        });
 
-
+//        initTack();
     }
 
     private void GetMyLocation() {
@@ -710,7 +711,7 @@ public class MainActivity extends Activity implements Observer {
     }
 
 
-    private TextView showCurrentPositionTV;
+//    private TextView showCurrentPositionTV;
     private Button startTaskBtn,dataMapSwitchBtn,showFindBtsBtn;
     /**
      * 初始换功能按钮
@@ -757,7 +758,7 @@ public class MainActivity extends Activity implements Observer {
                 startActivity(intent);
             }
         });
-        showCurrentPositionTV = (TextView)findViewById(R.id.tv_show_position);
+//        showCurrentPositionTV = (TextView)findViewById(R.id.tv_show_position);
     }
 
     private LinkedList<LatLng>  trackList = new LinkedList<>();
