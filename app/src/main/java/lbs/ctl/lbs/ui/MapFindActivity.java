@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -22,6 +24,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.InfoWindow;
@@ -45,6 +48,7 @@ import lbs.ctl.lbs.BaiduMap.LocationService;
 import lbs.ctl.lbs.R;
 import lbs.ctl.lbs.WebServiceConn;
 import lbs.ctl.lbs.database.DbAcessImpl;
+import lbs.ctl.lbs.luce.CellType;
 import lbs.ctl.lbs.luce.LuceCellInfo;
 import lbs.ctl.lbs.utils.AlrDialog_Show;
 import lbs.ctl.lbs.utils.GPSUtils;
@@ -192,10 +196,27 @@ public class MapFindActivity extends AppCompatActivity {
                     {
                         new Thread(new Runnable() {
                             public void run() {
-                                Request_Gps();
+                                Request_Gps(0);
                             }
                         }).start();
                     }
+            }
+        });
+        qure_Btn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                //长按查询本地数据
+                boolean start_flg=false;
+                start_flg=GetRequestParam();
+                if(start_flg==true)
+                {
+                    new Thread(new Runnable() {
+                        public void run() {
+                            Request_Gps(1);
+                        }
+                    }).start();
+                }
+                return true;
             }
         });
 
@@ -273,9 +294,11 @@ public class MapFindActivity extends AppCompatActivity {
         @Override
         public void onNothingSelected(AdapterView<?> parent) {}
     };
-    private void Request_Gps()//查询经纬度
+    String[] parameters=new String[3];
+    private void Request_Gps(int s)//查询经纬度
     {
-        String[] parameters=new String[3];
+        int flag_int=s;
+//        String[] parameters=new String[3];
         String[] get_msg=new String[2];
         get_msg[0]="";
         get_msg[1]="";
@@ -300,24 +323,120 @@ public class MapFindActivity extends AppCompatActivity {
             luceCellInfo.setLac_sid(Integer.valueOf(lac));
             luceCellInfo.setCi_nid(Integer.valueOf(cellid));
         }
-        Local_Qur(luceCellInfo);
+        Local_Qur(luceCellInfo,flag_int);
     }
-    private void Local_Qur(LuceCellInfo luceCellInfo)
+    private void Local_Qur(LuceCellInfo luceCellInfo,int flag)
     {
-        //查询后台服务器
-        new FindPos(luceCellInfo).execute();
-//        findDbImpl();
-
+        if (flag==0){//单击
+            //查询后台服务器
+            new FindPos(luceCellInfo).execute();
+        }else if (flag==1){//长按
+                    findDbImpl();
+        }
     }
-
-//    private void findDbImpl() {
-//        List<LuceCellInfo> list_luces=new ArrayList<>();
-//        if (mode==dataCode.cdma){
-//            list_luces=impl.findBtsUseId(lac,cellid,bid);
-//        }else {
-//            list_luces=impl.findBtsUseId(lac,cellid,);
-//        }
-//    }
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.arg1==1){
+                Toast.makeText(context, "本地没有数据，请先采集数据后再进行查询", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+    private void findDbImpl() {
+        List<LuceCellInfo> list_luces=new ArrayList<>();
+        List<Integer> list_rssi=new ArrayList<>();
+        List<Point> list_point=new ArrayList<>();
+        List<LatLng> latLngs=new ArrayList<>();
+        if (mode==dataCode.cdma){
+            list_luces=impl.findBtsUseId(lac,cellid,bid);
+        }else if (mode==dataCode.china_mobile){
+            list_luces.addAll(impl.findBtsUseId(lac,cellid, CellType.GSM_M));
+            list_luces.addAll(impl.findBtsUseId(lac,cellid, CellType.TDSCDMA));
+            list_luces.addAll(impl.findBtsUseId(lac,cellid, CellType.LTE));
+        }else if (mode==dataCode.china_unicom){
+            list_luces.addAll(impl.findBtsUseId(lac,cellid,CellType.GSM_U));
+            list_luces.addAll(impl.findBtsUseId(lac,cellid,CellType.WCDMA));
+        }
+        if (list_luces.size()>0){
+            for (int i=0;i<list_luces.size();i++){
+                list_rssi.add(list_luces.get(i).getRssi());
+            }
+            for (int i=0;i<list_luces.size();i++){
+                Point point=new Point();
+                point.setLat(list_luces.get(i).getLatitude()+"");
+                point.setLon(list_luces.get(i).getLongitude()+"");
+                point.setAddr(list_luces.get(i).getAddress()+"");
+                point.setRssi(list_luces.get(i).getRssi()+"");
+                list_point.add(point);
+            }
+            int max_rssi=0;
+            int min_rssi=0;
+            //按强度渐变添加覆盖物
+            if (list_rssi.size()>0){
+                max_rssi=Integer.valueOf(list_rssi.get(0));
+                min_rssi=Integer.valueOf(list_rssi.get(0));
+                for (int i=0;i<list_rssi.size()-1;i++){
+                    int current=Integer.valueOf(list_rssi.get(i));
+                    if (current>max_rssi){
+                        max_rssi=current;
+                    } else if (current<min_rssi){
+                        min_rssi=current;
+                    }
+                }
+            }
+            for (int i=0;i<list_luces.size();i++){
+                int rssi_rgb=(Integer.valueOf(list_luces.get(i).getRssi())-min_rssi)*100/(max_rssi-min_rssi);
+                final double[] latlon1= GPSUtils.wgs2bd(Double.valueOf(list_luces.get(i).getLatitude()),Double.valueOf(list_luces.get(i).getLongitude()));
+                if (!((int)latlon1[0]==0&&(int)latlon1[1]==0)){
+                    baiduMapUtil.addMarker(latlon1[0],latlon1[1],"基站信息："+parameters[0]+","+parameters[1]+","+parameters[2]+"\n"
+                            +Double.valueOf(list_luces.get(i).getRssi())+"",(100-rssi_rgb)*255/100 ,rssi_rgb*255/100,0f,1.0f);
+                }
+            }
+            for (int i=0;i<list_point.size();i++){
+                Point point= list_point.get(i);
+                double lat=Double.valueOf(point.getLat());
+                double lon=Double.valueOf(point.getLon());
+                if ((int)lat==0&&(int)lon==0){
+                    list_luces.remove(point);
+                    i--;
+                }
+            }
+            //垃框查询
+            if (list_luces.size()>=3){
+                ConvexHull convexHull=new ConvexHull(list_point);
+                List<Point> list_po=convexHull.calculateHull();
+                for (int i=0;i<list_po.size();i++){
+                    Point point=list_po.get(i);
+                    final double[] latlon= GPSUtils.wgs2bd(Double.valueOf(point.getLat()),Double.valueOf(point.getLon()));
+                    LatLng latLng=new LatLng(latlon[0],latlon[1]);
+                    latLngs.add(latLng);
+                }
+                if (showList.size()==0){
+                    baiduMapUtil.draw_find(latLngs);
+                }else if (showList.size()==1||showList.size()>1){
+                    OverlayOptions polygonOption=null;
+                    if (showList.size()<7){
+                        polygonOption = new PolygonOptions()
+                                .points(latLngs)
+                                .stroke(new Stroke(5, color[showList.size()-1]))//color[showList.size()-1]
+                                .fillColor(0x80ffffff);
+                    }else {
+                        polygonOption = new PolygonOptions()
+                                .points(latLngs)
+                                .stroke(new Stroke(5, color[showList.size()-7]))//color[showList.size()-7]
+                                .fillColor(0x80ffffff);
+                    }
+                    showList.add(polygonOption);
+                    baiduMapUtil.add_more_overlay(showList);
+                }
+            }
+        }else {
+            Message msg=new Message();
+            msg.arg1=1;
+            handler.sendMessage(msg);
+        }
+    }
 
     /**
      * 查询基站位置
@@ -388,7 +507,7 @@ public class MapFindActivity extends AppCompatActivity {
                         if (jsonObject.has("acc")){
                             if (!((int)lat1==0&&(int)lon1==0)){
                                 end_latLng=new LatLng(latlon[0],latlon[1]);
-                                baiduMapUtil.addMarker(latlon[0],latlon[1],"第三方数据",0f,0f,255f,1.0f);
+                                baiduMapUtil.addMarker(latlon[0],latlon[1],"基站信息："+parameters[0]+","+parameters[1]+","+parameters[2]+"\n"+"第三方数据",0f,0f,255f,1.0f);
                             }
                         }
                         else if (jsonObject.has("rssi")){
@@ -415,7 +534,7 @@ public class MapFindActivity extends AppCompatActivity {
                         int rssi_rgb=(Integer.valueOf(list.get(i).getRssi())-min_rssi)*100/(max_rssi-min_rssi);
                         final double[] latlon1= GPSUtils.wgs2bd(Double.valueOf(list.get(i).getLat()),Double.valueOf(list.get(i).getLon()));
                         if (!((int)latlon1[0]==0&&(int)latlon1[1]==0)){
-                            baiduMapUtil.addMarker(latlon1[0],latlon1[1],Double.valueOf(list.get(i).getRssi())+"",(100-rssi_rgb)*255/100 ,rssi_rgb*255/100,0f,1.0f);
+                            baiduMapUtil.addMarker(latlon1[0],latlon1[1],"基站信息："+parameters[0]+","+parameters[1]+","+parameters[2]+"\n"+Double.valueOf(list.get(i).getRssi())+"",(100-rssi_rgb)*255/100 ,rssi_rgb*255/100,0f,1.0f);
                         }
                     }
                     for (int i=0;i<list.size();i++){
@@ -466,7 +585,8 @@ public class MapFindActivity extends AppCompatActivity {
                 if(!list.isEmpty()) {
                     luceCellInfos.add(cellInfo);
                     baiduMapUtil.addMarker(Double.valueOf(list.get(0)), Double.valueOf(list.get(1)),
-                            "手机数据库数据", 251f, 93f, 255f, 1f);
+                            "基站信息："+parameters[0]+","+parameters[1]+","+parameters[2]+"\n"+"手机数据库数据",
+                            251f, 93f, 255f, 1f);
                 }else {
                     AlertDialog.Builder builder=new AlertDialog.Builder(context);
                     builder.setTitle("温馨提示");
