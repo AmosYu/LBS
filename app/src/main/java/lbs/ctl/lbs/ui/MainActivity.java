@@ -392,6 +392,12 @@ public class MainActivity extends Activity implements Observer {
                 revThread = new RevThread(allCellInfo, bluetoothConn, context);
                 new Thread(revThread).start();
             } else {
+//                startTaskBtn.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        modeSpinner.setEnabled(true);
+//                    }
+//                });
                 if (revThread != null) {
                     revThread.isTerminated();
                     revThread = null;
@@ -407,6 +413,7 @@ public class MainActivity extends Activity implements Observer {
                 public void run() {
                     devConTv.setText(state.toString());
                     startTaskBtn.setEnabled(state==BluetoothState.CONNECTED);
+                    if(state!=BluetoothState.CONNECTED) modeSpinner.setEnabled(true);
                 }
             });
         }
@@ -719,13 +726,18 @@ public class MainActivity extends Activity implements Observer {
     private void initButton() {
 
         startTaskBtn = (Button) findViewById(R.id.main_start_task_btn);
+        startTaskBtn.setEnabled(false);
         startTaskBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!allCellInfo.isDataSaveToDb()) {
                     allCellInfo.setDataSaveToDb(true);
                     startTaskBtn.setText("停止任务");
+                    initSpinner();
+                    modeSpinner.setEnabled(false);
+
                 } else {
+                    modeSpinner.setEnabled(true);
                     allCellInfo.setDataSaveToDb(false);
                     startTaskBtn.setText("开始任务");
                 }
@@ -861,13 +873,22 @@ public class MainActivity extends Activity implements Observer {
     private void initMapTopView() {
 
         modeSpinner=(Spinner)findViewById(R.id.spinner_marker_type);
+//        Resources res = getResources ();
+//        String[] modes = res.getStringArray(R.array.mode_arrays);
+//        typeSpinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, modes);
+//        typeSpinnerAdapter.setDropDownViewResource(R.layout.drop_down_item);
+//        modeSpinner.setAdapter(typeSpinnerAdapter);
+//        modeSpinner.setOnItemSelectedListener(typeLis);
+        initSpinner();
+
+    }
+    private void initSpinner(){
         Resources res = getResources ();
         String[] modes = res.getStringArray(R.array.mode_arrays);
         typeSpinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, modes);
         typeSpinnerAdapter.setDropDownViewResource(R.layout.drop_down_item);
         modeSpinner.setAdapter(typeSpinnerAdapter);
         modeSpinner.setOnItemSelectedListener(typeLis);
-
     }
 
     AdapterView.OnItemSelectedListener typeLis = new AdapterView.OnItemSelectedListener() {

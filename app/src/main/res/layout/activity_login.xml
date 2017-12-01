@@ -26,6 +26,7 @@
             android:id="@+id/new_task_top_btn"
             android:layout_alignParentRight="true"
             android:text="新建任务"
+            android:background="@drawable/btn_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -66,6 +67,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:text="基站查询"
+            android:background="@drawable/btn_style"
             android:layout_height="match_parent"
             android:visibility="gone"/>
         <Button
@@ -73,31 +75,36 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:text="离线地图"
+            android:background="@drawable/btn_style"
             android:layout_height="match_parent" />
         <Button
             android:id="@+id/login_import_btn"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:text="文件导入"
+            android:background="@drawable/btn_style"
             android:layout_height="match_parent" />
         <Button
             android:id="@+id/login_export_btn"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:text="文件导出"
+            android:background="@drawable/btn_style"
             android:layout_height="match_parent" />
         <Button
             android:id="@+id/login_upload_btn"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:text="文件上传"
+            android:background="@drawable/btn_style"
             android:layout_height="match_parent" />
         <Button
             android:id="@+id/main_config_btn"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_marginLeft="8dp"
+
             android:text="配置"
+            android:background="@drawable/btn_style"
             android:layout_height="match_parent" />
     </LinearLayout>
 </RelativeLayout>

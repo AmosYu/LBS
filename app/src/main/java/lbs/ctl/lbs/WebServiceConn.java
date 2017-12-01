@@ -1,5 +1,6 @@
 package lbs.ctl.lbs;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -46,7 +47,8 @@ public class WebServiceConn {
             key = MD5Utils.toMD5("terminal" + ":" + devId + ":LUCE_SYSTEM_CHECK");
         }
     }
-    public WebServiceConn( Context context) {
+    @SuppressLint("MissingPermission")
+    public WebServiceConn(Context context) {
         this.context = context;
         SharedPreferences sharedPreferences= context.getSharedPreferences("AIRINTERFACE", Activity.MODE_PRIVATE);
         String ip = sharedPreferences.getString("IP","192.168.1.105");
@@ -54,7 +56,8 @@ public class WebServiceConn {
         this.serverAddress = ip+":"+port;
         this.context = context;
         TelephonyManager telephonyManager= (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        devId = telephonyManager.getDeviceId();
+//        devId = telephonyManager.getDeviceId();
+        devId= "000000000000000";
         key = MD5Utils.toMD5("terminal" + ":" + devId + ":LUCE_SYSTEM_CHECK");
     }
 
@@ -184,7 +187,7 @@ public class WebServiceConn {
             envelope.dotNet = true;
 
             envelope.setOutputSoapObject(rpc);
-            HttpTransportSE ht = new HttpTransportSE(url,3000);
+            HttpTransportSE ht = new HttpTransportSE(url,4000);
             ht.debug = true;
             ht.call(SOAP_ACTION, envelope);
             return new JSONObject(envelope.getResponse().toString());
