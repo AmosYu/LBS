@@ -20,7 +20,7 @@ import lbs.ctl.lbs.R;
  */
 public class ConfigDialog {
 
-    EditText ipEdit;
+    EditText ipEdit,portEdit;
     RelativeLayout layout;
 
     public  void showConfig(final Context context)
@@ -34,7 +34,7 @@ public class ConfigDialog {
         dialog.getWindow().setContentView(layout);
 
         ipEdit = (EditText)layout.findViewById(R.id.ip);
-
+        portEdit = (EditText)layout.findViewById(R.id.port);
 
         Button setIpBtn = (Button) layout.findViewById(R.id.seting);
         setIpBtn.setOnClickListener(new View.OnClickListener()
@@ -44,8 +44,10 @@ public class ConfigDialog {
             public void onClick(View v)
             {
                 String ipstr=ipEdit.getText().toString();
+                String port = portEdit.getText().toString();
                 SharedPreferences.Editor editor= context.getSharedPreferences("AIRINTERFACE", Activity.MODE_PRIVATE).edit();
                 editor.putString("IP",ipstr);
+                editor.putString("PORT",port);
                 editor.commit();
                 dialog.dismiss();
             }

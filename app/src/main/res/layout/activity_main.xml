@@ -9,7 +9,7 @@
         android:id="@+id/main_top_rela"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:orientation="horizontal"    android:background="@color/blue3">
+        android:orientation="horizontal"    android:background="@color/colorPrimaryDark">
 
         <ImageView
             android:id="@+id/logo_imageview"
@@ -25,6 +25,7 @@
             android:text="设备：未连接"
             android:gravity="center|left"
             android:textSize="@dimen/text_size_16"
+            android:textColor="@color/white"
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/logo_imageview" />
