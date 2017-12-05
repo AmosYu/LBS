@@ -35,8 +35,8 @@ public class WebServiceConn {
         if (num==0){
             this.context = context;
             SharedPreferences sharedPreferences= context.getSharedPreferences("AIRINTERFACE", Activity.MODE_PRIVATE);
-            String ip = sharedPreferences.getString("IP","192.168.1.39");//222.128.36.167
-            String port = sharedPreferences.getString("PORT","80");
+            String ip = sharedPreferences.getString("IP","222.128.36.167");//222.128.36.167
+            String port = sharedPreferences.getString("PORT","89");
             this.serverAddress = ip+":"+port;
             this.context = context;
             TelephonyManager telephonyManager= (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);

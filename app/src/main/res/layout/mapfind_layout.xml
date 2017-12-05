@@ -238,13 +238,15 @@
             android:textColor="@color/black"
             android:textSize="@dimen/size_18sp"
             android:gravity="center_vertical"
-            android:layout_marginLeft="8dp"/>
+            android:layout_marginLeft="8dp"
+            android:visibility="gone"/>
         <ListView
             android:id="@+id/cell_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:layout_marginLeft="8dp"/>
+            android:layout_marginLeft="8dp"
+            android:visibility="gone"/>
     </LinearLayout>
 
 </LinearLayout>

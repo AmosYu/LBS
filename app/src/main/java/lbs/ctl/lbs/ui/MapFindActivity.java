@@ -40,7 +40,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lbs.ctl.lbs.BaiduMap.BaiduMapUtil;
 import lbs.ctl.lbs.BaiduMap.ConvexHull;
@@ -385,6 +387,14 @@ public class MapFindActivity extends AppCompatActivity {
                     }
                 }
             }
+//            List<Map<String,String>> list_num=new ArrayList<>();
+//            for (int i=0;i<list_luces.size();i++){
+//                LuceCellInfo cellInfo=list_luces.get(i);
+//                String lat_lon=cellInfo.getLatitude()+","+cellInfo.getLongitude();
+//                if (list_num==null||list_num.size()==0){
+//
+//                }
+//            }
             for (int i=0;i<list_luces.size();i++){
                 int rssi_rgb=(Integer.valueOf(list_luces.get(i).getRssi())-min_rssi)*100/(max_rssi-min_rssi);
                 final double[] latlon1= GPSUtils.wgs2bd(Double.valueOf(list_luces.get(i).getLatitude()),Double.valueOf(list_luces.get(i).getLongitude()));
@@ -398,14 +408,14 @@ public class MapFindActivity extends AppCompatActivity {
                 double lat=Double.valueOf(point.getLat());
                 double lon=Double.valueOf(point.getLon());
                 if ((int)lat==0&&(int)lon==0){
-                    list_luces.remove(point);
+                    list_point.remove(point);
                     i--;
                 }
             }
             //垃框查询
-            if (list_luces.size()>=3){
-                ConvexHull convexHull=new ConvexHull(list_point);
-                List<Point> list_po=convexHull.calculateHull();
+            ConvexHull convexHull=new ConvexHull(list_point);
+            List<Point> list_po=convexHull.calculateHull();
+            if (list_po.size()>=3){
                 for (int i=0;i<list_po.size();i++){
                     Point point=list_po.get(i);
                     final double[] latlon= GPSUtils.wgs2bd(Double.valueOf(point.getLat()),Double.valueOf(point.getLon()));
@@ -430,6 +440,8 @@ public class MapFindActivity extends AppCompatActivity {
                     showList.add(polygonOption);
                     baiduMapUtil.add_more_overlay(showList);
                 }
+            }else {
+
             }
         }else {
             Message msg=new Message();
@@ -546,10 +558,10 @@ public class MapFindActivity extends AppCompatActivity {
                             i--;
                         }
                     }
+                    ConvexHull convexHull=new ConvexHull(list);
+                    List<Point> list_po=convexHull.calculateHull();
                     //垃框查询
-                    if (list.size()>=3){
-                        ConvexHull convexHull=new ConvexHull(list);
-                        List<Point> list_po=convexHull.calculateHull();
+                    if (list_po.size()>=3){
                         for (int i=0;i<list_po.size();i++){
                             Point point=list_po.get(i);
                             final double[] latlon= GPSUtils.wgs2bd(Double.valueOf(point.getLat()),Double.valueOf(point.getLon()));
@@ -574,6 +586,8 @@ public class MapFindActivity extends AppCompatActivity {
                             showList.add(polygonOption);
                             baiduMapUtil.add_more_overlay(showList);
                         }
+                    }else {
+
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
